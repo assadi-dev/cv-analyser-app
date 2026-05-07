@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/Button"
 import { cn } from "@/lib/utils"
 import { registerSchema, passwordStrength, type RegisterFormValues } from "@/lib/schemas"
 import { useState } from "react"
+import { sendEncryptedCredentials } from "@/lib/security"
 
 // ─── Password strength bar ────────────────────────────────────────────────────
 
@@ -62,10 +63,10 @@ export default function RegisterPage() {
    * - redirectTo: where to go after successful registration
    * - error:      server error message surfaced in the URL (useful for OAuth errors)
    */
-  const [redirectTo]    = useQueryState("redirectTo", { defaultValue: "/analyser" })
-  const [urlError]      = useQueryState("error")
+  const [redirectTo] = useQueryState("redirectTo", { defaultValue: "/analyser" })
+  const [urlError] = useQueryState("error")
 
-  const [showPwd, setShowPwd]         = useState(false)
+  const [showPwd, setShowPwd] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [serverError, setServerError] = useState<string | null>(urlError)
 
@@ -75,59 +76,81 @@ export default function RegisterPage() {
     watch,
     setValue,
     formState: { errors, isSubmitting },
+    setError,
+    clearErrors
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      firstName:         "",
-      lastName:          "",
-      email:             "",
+      firstName: "",
+      lastName: "",
+      email: "",
       professionalTitle: "",
-      password:          "",
-      confirmPassword:   "",
-      acceptTerms:       false,
+      password: "",
+      confirmPassword: "",
+      acceptTerms: false,
     },
   })
 
-  const password      = watch("password")
-  const confirmPwd    = watch("confirmPassword")
-  const acceptTerms   = watch("acceptTerms")
+  const password = watch("password")
+  const confirmPwd = watch("confirmPassword")
+  const acceptTerms = watch("acceptTerms")
 
   async function onSubmit(values: RegisterFormValues) {
     setServerError(null)
+    clearErrors()
+
+    let api_token: string
 
     try {
-      // 1 — Create account via better-auth
+
+      // 1 — Token exchange with FastAPI (one-time bridge)
+      const encryptedData = await sendEncryptedCredentials({
+        email: values.email.trim(),
+        firstname: values.firstName.trim(),
+        lastname: values.lastName.trim(),
+        professional_title: values.professionalTitle?.trim() || null,
+        auth_provider: "email",
+      })
+
+      if (!encryptedData) {
+        throw new Error("Erreur lors de l'échange de token")
+      }
+
+      try {
+        // 2 — Sync extended profile to FastAPI
+        const { token, expires_at } = await api.post("/api/v1/auth/token", {
+          encrypted_key: encryptedData.encryptedKey,
+          iv: encryptedData.iv,
+          encrypted_data: encryptedData.encryptedData,
+        }) as AuthenApiResponse
+        api_token = token
+        console.log("Token", token)
+        console.log("Expires at", expires_at)
+
+      } catch (err) {
+        console.log("Erreur lors de l'échange de token", err)
+
+      }
+
+      // 3 — Create account via better-auth
       const result = await signUp.email({
-        email:    values.email.trim(),
+        email: values.email.trim(),
         password: values.password,
-        name:     `${values.firstName.trim()} ${values.lastName.trim()}`,
+        name: `${values.firstName.trim()} ${values.lastName.trim()}`,
       })
 
       if (result.error) {
         throw new Error(result.error.message ?? "Inscription échouée")
       }
 
-      // 2 — Token exchange with FastAPI (one-time bridge)
-      const sessionToken = (result.data as any)?.session?.token ?? ""
-      if (sessionToken) {
-        await exchangeToken(sessionToken)
-      }
-
-      // 3 — Sync extended profile to FastAPI
-      await api.patch("/api/v1/settings/profile", {
-        first_name:         values.firstName.trim(),
-        last_name:          values.lastName.trim(),
-        professional_title: values.professionalTitle?.trim() || null,
-      })
 
       router.push(redirectTo)
     } catch (err) {
       const msg = (err as Error).message ?? "Une erreur est survenue"
-      setServerError(
-        msg.toLowerCase().includes("already") || msg.toLowerCase().includes("email")
-          ? "Un compte existe déjà avec cette adresse email."
-          : msg,
-      )
+      const errorMessage = msg.toLowerCase().includes("already") || msg.toLowerCase().includes("email")
+        ? "Un compte existe déjà avec cette adresse email."
+        : msg
+      setError("root", { message: errorMessage })
     }
   }
 
@@ -452,13 +475,13 @@ export default function RegisterPage() {
             </div>
 
             {/* Server error */}
-            {serverError && (
+            {errors.root && (
               <div
-                className="flex items-center gap-2 px-3 py-2.5 rounded-[8px] text-[12px]"
+                className="flex items-center gap-2 px-3 py-2.5 rounded-md text-[12px]"
                 style={{ background: "var(--color-danger-light)", color: "var(--color-danger-text)" }}
               >
                 <Info size={14} className="shrink-0" />
-                {serverError}
+                {errors.root.message}
               </div>
             )}
 

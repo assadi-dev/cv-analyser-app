@@ -12,20 +12,19 @@ import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { db } from "@/db/client"
 import * as schema from "@/db/schema"
+import { customSession, username } from "better-auth/plugins"
+import { nextCookies } from "better-auth/next-js"
+import { dataToEncryption } from "./security"
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
-  secret:  process.env.BETTER_AUTH_SECRET!,
+  secret: process.env.BETTER_AUTH_SECRET!,
 
   // ── Drizzle adapter — persists sessions and users in PostgreSQL ──────────
   database: drizzleAdapter(db, {
     provider: "pg",
-    schema: {
-      user:         schema.user,
-      session:      schema.session,
-      account:      schema.account,
-      verification: schema.verification,
-    },
+    schema,
+
   }),
 
   // ── Email / password ──────────────────────────────────────────────────────
@@ -34,14 +33,36 @@ export const auth = betterAuth({
     requireEmailVerification: false, // Personal app — skip email verification
   },
 
+  plugins: [
+    username(), nextCookies(),
+    customSession(
+      async ({ session, user }) => {
+
+
+        return {
+          ...session,
+          user: {
+            ...user,
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.image,
+          },
+        }
+      }
+    )
+
+
+  ],
+
   // ── OAuth providers ───────────────────────────────────────────────────────
   socialProviders: {
     google: {
-      clientId:     process.env.GOOGLE_CLIENT_ID!,
+      clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     },
     linkedin: {
-      clientId:     process.env.LINKEDIN_CLIENT_ID!,
+      clientId: process.env.LINKEDIN_CLIENT_ID!,
       clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
     },
   },
@@ -56,3 +77,6 @@ export const auth = betterAuth({
     process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
   ],
 })
+
+
+

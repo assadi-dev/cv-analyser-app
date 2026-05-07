@@ -12,6 +12,7 @@ import { exchangeToken } from "@/lib/api"
 import { Button } from "@/components/ui/Button"
 import { cn } from "@/lib/utils"
 import { loginSchema, type LoginFormValues } from "@/lib/schemas"
+import { sendEncryptedCredentials } from "@/lib/security"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -24,7 +25,7 @@ export default function LoginPage() {
    * - error:      OAuth or session error message passed in the URL
    */
   const [redirectTo] = useQueryState("redirectTo", { defaultValue: "/analyser" })
-  const [urlError]   = useQueryState("error")
+  const [urlError] = useQueryState("error")
 
   const {
     register,
@@ -40,17 +41,22 @@ export default function LoginPage() {
 
     try {
       const result = await signIn.email({
-        email:    values.email.trim(),
+        email: values.email.trim(),
         password: values.password,
       })
 
       if (result.error) throw new Error(result.error.message)
 
       // Token exchange with FastAPI — one call, then FastAPI is autonomous
-      const sessionToken = (result.data as any)?.session?.token ?? ""
-      if (sessionToken) await exchangeToken(sessionToken)
+      const encryptedData = await sendEncryptedCredentials({
+        email: values.email.trim(),
+        firstname: result.data.user.name,
+        lastname: result.data.user.name,
+        auth_provider: "email",
+      })
+      console.log(encryptedData)
 
-      router.push(redirectTo)
+      //router.push(redirectTo)
     } catch (err) {
       const msg = (err as Error).message ?? "Connexion échouée"
       setServerError(
@@ -103,9 +109,9 @@ export default function LoginPage() {
 
           <div className="flex gap-0 pt-2">
             {[
-              { value: "Score ATS",  label: "par offre analysée" },
-              { value: "Écarts",     label: "identifiés en un clin d'œil" },
-              { value: "Conseils",   label: "IA personnalisés" },
+              { value: "Score ATS", label: "par offre analysée" },
+              { value: "Écarts", label: "identifiés en un clin d'œil" },
+              { value: "Conseils", label: "IA personnalisés" },
             ].map((stat, i) => (
               <div key={stat.value} className="flex gap-0 items-center">
                 {i > 0 && <div className="w-px h-10 mx-5" style={{ background: "rgba(255,255,255,0.1)" }} />}

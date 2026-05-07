@@ -1,11 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { User, FileText, Cpu, Layers, Shield, Check, Zap, Key, EyeOff, Eye } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { User, FileText, Cpu, Layers, Shield, Check, Zap, Key, EyeOff, Eye, Trash2 } from "lucide-react"
 import { api } from "@/lib/api"
+import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { Card, CardHeader } from "@/components/ui/Card"
+import { Modal } from "@/components/ui/Modal"
 import { cn } from "@/lib/utils"
 import type { User as UserType, AIProvider, CV } from "@/types"
 
@@ -29,10 +32,16 @@ const AI_PROVIDERS: { id: AIProvider; label: string; models: string[]; color: st
 const PLATFORMS = ["LinkedIn", "Welcome to the Jungle", "Indeed", "Apec", "Cadremploi", "Monster"]
 
 export default function ParametresPage() {
+  const router = useRouter()
   const [activeSection, setActiveSection] = useState("profile")
   const [user, setUser]         = useState<UserType | null>(null)
   const [cvs, setCVs]           = useState<CV[]>([])
   const [saving, setSaving]     = useState(false)
+
+  // Delete account
+  const [deleteOpen, setDeleteOpen]       = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState("")
+  const [deleting, setDeleting]           = useState(false)
 
   // Profile form
   const [firstName, setFirstName] = useState("")
@@ -76,6 +85,18 @@ export default function ParametresPage() {
     const res = await api.post<{ success: boolean; message: string }>("/api/v1/settings/ai-provider/test", {})
     setTestResult(res)
     setTesting(false)
+  }
+
+  async function handleDeleteAccount() {
+    setDeleting(true)
+    try {
+      await authClient.deleteUser()
+      router.push("/login")
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setDeleting(false)
+    }
   }
 
   async function saveAIProvider() {
@@ -305,9 +326,9 @@ export default function ParametresPage() {
               subtitle="Gérez vos données personnelles et les informations stockées" />
             <div className="flex flex-col gap-3">
               {[
-                { label: "Exporter mes données", sub: "Télécharger toutes vos analyses et candidatures — JSON ou CSV", actions: ["JSON", "CSV"], danger: false },
-                { label: "Supprimer toutes les analyses", sub: "Efface l'historique des analyses IA sans toucher aux candidatures", actions: ["Supprimer"], danger: true },
-                { label: "Réinitialiser l'application", sub: "Supprime toutes les données, analyses, candidatures et préférences. Irréversible.", actions: ["Réinitialiser"], danger: true },
+                { label: "Exporter mes données", sub: "Télécharger toutes vos analyses et candidatures — JSON ou CSV", actions: ["JSON", "CSV"], danger: false, onClick: undefined },
+                { label: "Supprimer toutes les analyses", sub: "Efface l'historique des analyses IA sans toucher aux candidatures", actions: ["Supprimer"], danger: true, onClick: undefined },
+                { label: "Réinitialiser l'application", sub: "Supprime toutes les données, analyses, candidatures et préférences. Irréversible.", actions: ["Réinitialiser"], danger: true, onClick: undefined },
               ].map((row) => (
                 <div key={row.label}
                   className="flex items-center gap-3 h-14 px-4 rounded-[10px] border"
@@ -328,10 +349,77 @@ export default function ParametresPage() {
                   </div>
                 </div>
               ))}
+
+              {/* Delete account */}
+              <div
+                className="flex items-center gap-3 px-4 py-4 rounded-[10px] border mt-2"
+                style={{ background: "#FEF2F2", borderColor: "#FECACA" }}
+              >
+                <div className="w-9 h-9 rounded-md flex items-center justify-center shrink-0" style={{ background: "#FEE2E2" }}>
+                  <Trash2 size={16} style={{ color: "var(--color-danger-text)" }} />
+                </div>
+                <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+                  <span className="text-[13px] font-semibold" style={{ color: "var(--color-danger-text)" }}>
+                    Supprimer mon compte
+                  </span>
+                  <span className="text-[11px]" style={{ color: "#F87171" }}>
+                    Supprime définitivement votre compte, toutes vos données et analyses. Cette action est irréversible.
+                  </span>
+                </div>
+                <Button variant="danger" size="sm" onClick={() => setDeleteOpen(true)}>
+                  Supprimer le compte
+                </Button>
+              </div>
             </div>
           </Card>
         )}
       </div>
+
+      {/* ── Delete account modal ── */}
+      <Modal
+        open={deleteOpen}
+        onClose={() => { setDeleteOpen(false); setDeleteConfirm("") }}
+        title="Supprimer mon compte"
+        size="md"
+        icon={<Trash2 size={15} style={{ color: "var(--color-danger-text)" }} />}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => { setDeleteOpen(false); setDeleteConfirm("") }}>
+              Annuler
+            </Button>
+            <Button
+              variant="danger"
+              loading={deleting}
+              disabled={deleteConfirm !== "SUPPRIMER"}
+              onClick={handleDeleteAccount}
+              className="ml-auto"
+            >
+              Supprimer définitivement
+            </Button>
+          </>
+        }
+      >
+        <div className="px-6 py-5 flex flex-col gap-4">
+          <div className="flex flex-col gap-1 p-4 rounded-[10px]" style={{ background: "#FEF2F2", border: "1px solid #FECACA" }}>
+            <p className="text-[13px] font-semibold" style={{ color: "var(--color-danger-text)" }}>
+              Cette action est irréversible
+            </p>
+            <p className="text-[12px]" style={{ color: "#F87171" }}>
+              Toutes vos données seront supprimées définitivement : profil, CV, analyses, candidatures et préférences.
+            </p>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[12px] font-semibold" style={{ color: "var(--color-text-secondary)" }}>
+              Tapez <span className="font-black">SUPPRIMER</span> pour confirmer
+            </label>
+            <Input
+              value={deleteConfirm}
+              onChange={(e) => setDeleteConfirm(e.target.value)}
+              placeholder="SUPPRIMER"
+            />
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
