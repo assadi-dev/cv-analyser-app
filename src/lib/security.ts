@@ -1,3 +1,5 @@
+import { EncryptedData } from "@/app/(auth)/type";
+
 const bufferToBase64 = (buffer: Uint8Array | ArrayBuffer) => {
     return btoa(String.fromCharCode(...new Uint8Array(buffer)))
 }
@@ -38,11 +40,7 @@ export const loadPublicKey = async () => {
     }
 }
 
-type EncryptedData = {
-    encryptedKey: string;
-    iv: string;
-    encryptedData: string;
-}
+
 
 export const dataToEncryption = async (data: any): Promise<EncryptedData | null | undefined> => {
     try {
@@ -96,7 +94,7 @@ type EncryptedUserData = {
     professional_title?: string | null;
     auth_provider: "email" | "google" | "linkedin";
 }
-export const sendEncryptedCredentials = async (data: EncryptedUserData) => {
+export const sendEncryptedCredentials = async (data: EncryptedUserData): Promise<EncryptedData | null | undefined> => {
     const encryptedData = await dataToEncryption(data)
     return encryptedData
 

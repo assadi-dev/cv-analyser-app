@@ -6,10 +6,10 @@ import { getInitials } from "@/lib/utils"
 import { signOut } from "@/lib/auth-client"
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
-  "/analyser":     { title: "Analyser votre CV",    subtitle: "Comparez votre CV avec une offre et obtenez votre score IA" },
-  "/dashboard":    { title: "Dashboard",            subtitle: "Suivi de ta recherche d'emploi" },
-  "/candidatures": { title: "Mes Candidatures",     subtitle: "Retrouve toutes tes candidatures et leur statut" },
-  "/parametres":   { title: "Paramètres",           subtitle: "Configurez votre expérience MatchCV" },
+  "/analyser": { title: "Analyser votre CV", subtitle: "Comparez votre CV avec une offre et obtenez votre score IA" },
+  "/dashboard": { title: "Dashboard", subtitle: "Suivi de ta recherche d'emploi" },
+  "/candidatures": { title: "Mes Candidatures", subtitle: "Retrouve toutes tes candidatures et leur statut" },
+  "/parametres": { title: "Paramètres", subtitle: "Configurez votre expérience MatchCV" },
 }
 
 interface TopbarProps {
@@ -22,6 +22,8 @@ export function Topbar({ user }: TopbarProps) {
   const page = PAGE_TITLES[pathname] ?? { title: "MatchCV", subtitle: "" }
   const [open, setOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+
+
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {

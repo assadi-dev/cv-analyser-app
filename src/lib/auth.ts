@@ -14,7 +14,8 @@ import { db } from "@/db/client"
 import * as schema from "@/db/schema"
 import { customSession, username } from "better-auth/plugins"
 import { nextCookies } from "better-auth/next-js"
-import { dataToEncryption } from "./security"
+import { dataToEncryption, sendEncryptedCredentials } from "./security"
+import { syncProfile } from "@/app/(auth)/helper"
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
@@ -37,8 +38,7 @@ export const auth = betterAuth({
     username(), nextCookies(),
     customSession(
       async ({ session, user }) => {
-
-
+        const { token, expires_at } = await exchangeToken(user)
         return {
           ...session,
           user: {
@@ -47,6 +47,10 @@ export const auth = betterAuth({
             email: user.email,
             name: user.name,
             image: user.image,
+            api: {
+              token: token,
+              expires_at: expires_at,
+            }
           },
         }
       }
@@ -80,3 +84,27 @@ export const auth = betterAuth({
 
 
 
+export const exchangeToken = async (user: any) => {
+  // Token exchange with FastAPI — one call, then FastAPI is autonomous
+  let token = null
+  let expires_at = null
+  const encryptedData = await sendEncryptedCredentials({
+    email: user.email,
+    firstname: user.name?.split(" ")[0] || "",
+    lastname: user.name?.split(" ")[1] || "",
+    auth_provider: "email",
+  })
+
+
+  if (encryptedData) {
+    const response = await syncProfile(encryptedData)
+    token = response?.token
+    expires_at = response?.expires_at
+  }
+
+  return {
+    token,
+    expires_at,
+  }
+
+}

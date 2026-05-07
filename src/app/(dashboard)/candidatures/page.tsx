@@ -9,20 +9,20 @@ import { cn, formatDate } from "@/lib/utils"
 import type { CandidatureSummary, CandidatureStatus, PaginatedResponse } from "@/types"
 
 const STATUS_TABS: { value: CandidatureStatus | "all"; label: string }[] = [
-  { value: "all",       label: "Toutes" },
-  { value: "to_send",   label: "À envoyer" },
-  { value: "sent",      label: "Envoyée" },
+  { value: "all", label: "Toutes" },
+  { value: "to_send", label: "À envoyer" },
+  { value: "sent", label: "Envoyée" },
   { value: "interview", label: "Entretien" },
-  { value: "accepted",  label: "Acceptée" },
+  { value: "accepted", label: "Acceptée" },
 ]
 
 export default function CandidaturesPage() {
   const [candidatures, setCandidatures] = useState<CandidatureSummary[]>([])
-  const [total, setTotal]       = useState(0)
-  const [search, setSearch]     = useState("")
+  const [total, setTotal] = useState(0)
+  const [search, setSearch] = useState("")
   const [activeTab, setActiveTab] = useState<CandidatureStatus | "all">("all")
-  const [loading, setLoading]   = useState(true)
-  const [page, setPage]         = useState(1)
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
   const PAGE_SIZE = 10
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function CandidaturesPage() {
       page_size: String(PAGE_SIZE),
       ...(activeTab !== "all" ? { status: activeTab } : {}),
     })
-    api.get<PaginatedResponse<CandidatureSummary>>(`/api/v1/candidatures?${params}`)
+    api.get<PaginatedResponse<CandidatureSummary>>(`/api/candidatures?${params}`)
       .then((data) => { setCandidatures(data.items); setTotal(data.total) })
       .catch(console.error)
       .finally(() => setLoading(false))
@@ -40,9 +40,9 @@ export default function CandidaturesPage() {
 
   const filtered = search
     ? candidatures.filter((c) =>
-        c.company_name.toLowerCase().includes(search.toLowerCase()) ||
-        c.job_title.toLowerCase().includes(search.toLowerCase())
-      )
+      c.company_name.toLowerCase().includes(search.toLowerCase()) ||
+      c.job_title.toLowerCase().includes(search.toLowerCase())
+    )
     : candidatures
 
   async function handleDelete(id: string) {

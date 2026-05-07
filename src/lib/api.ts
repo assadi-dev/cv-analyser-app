@@ -9,6 +9,7 @@
 
 import type { ApiError } from "@/types"
 
+const API_APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
 const TOKEN_KEY = "jobmatch_api_token"
 
@@ -46,7 +47,7 @@ export async function exchangeToken(sessionToken: string): Promise<string> {
   }
 
   const data: { api_token: string } = await res.json()
-  setApiToken(data.api_token)
+  //setApiToken(data.api_token)
   return data.api_token
 }
 
@@ -74,16 +75,58 @@ export async function apiFetch<T>(
   path: string,
   options: FetchOptions = {},
 ): Promise<T> {
-  const token = getApiToken()
+
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...options.headers,
   }
 
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`
+
+  const res = await fetch(`${API_APP_URL}${path}`, {
+    ...options,
+    headers,
+  })
+
+  if (!res.ok) {
+    const errorData: ApiError = await res.json().catch(() => ({
+      error: { code: "UNKNOWN", message: res.statusText, context: {} },
+      request_id: "",
+    }))
+
+    // Token expired — clear it and redirect to login
+    if (res.status === 401) {
+      clearApiToken()
+      if (typeof window !== "undefined") {
+        window.location.href = "/login"
+      }
+    }
+
+    throw new ApiRequestError(
+      res.status,
+      errorData.error.code,
+      errorData.error.message,
+      errorData.request_id,
+    )
   }
+
+  // Handle 204 No Content
+  if (res.status === 204) return undefined as T
+
+  return res.json() as Promise<T>
+}
+
+export async function apiExternalFetch<T>(
+  path: string,
+  options: FetchOptions = {},
+): Promise<T> {
+
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...options.headers,
+  }
+
 
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
@@ -142,5 +185,30 @@ export const api = {
       method: "POST",
       body: formData,
       headers: {}, // Let browser set Content-Type with boundary
+    }),
+}
+
+
+export const apiExternal = {
+  get: <T>(path: string, options?: FetchOptions) => apiExternalFetch<T>(path, options),
+
+  post: <T>(path: string, body: unknown, options?: FetchOptions) =>
+    apiExternalFetch<T>(path, { method: "POST", body: JSON.stringify(body), ...options }),
+
+  patch: <T>(path: string, body: unknown, options?: FetchOptions) =>
+    apiExternalFetch<T>(path, { method: "PATCH", body: JSON.stringify(body), ...options }),
+
+  put: <T>(path: string, body: unknown, options?: FetchOptions) =>
+    apiExternalFetch<T>(path, { method: "PUT", body: JSON.stringify(body), ...options }),
+
+  delete: <T>(path: string, options?: FetchOptions) =>
+    apiExternalFetch<T>(path, { method: "DELETE", ...options }),
+
+  upload: <T>(path: string, formData: FormData, options?: FetchOptions) =>
+    apiExternalFetch<T>(path, {
+      method: "POST",
+      body: formData,
+      headers: {}, // Let browser set Content-Type with boundary
+      ...options
     }),
 }

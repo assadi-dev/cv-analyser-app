@@ -176,3 +176,24 @@ export interface ApiError {
   }
   request_id: string
 }
+
+
+
+// ─── Settings ──────────────────────────────────────────────────────────────
+
+export interface Profile {
+  id: string
+  user_id: string
+  first_name: string
+  last_name: string
+  professional_title: string
+  avatar_url: string
+  ai_provider: AIProvider
+  ai_model: string
+  preferred_language: "fr" | "en"
+  ats_threshold: number
+  recommendation_detail: "concise" | "detailed"
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}

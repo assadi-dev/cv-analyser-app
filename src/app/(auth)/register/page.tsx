@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils"
 import { registerSchema, passwordStrength, type RegisterFormValues } from "@/lib/schemas"
 import { useState } from "react"
 import { sendEncryptedCredentials } from "@/lib/security"
+import { syncProfile } from "../helper"
 
 // ─── Password strength bar ────────────────────────────────────────────────────
 
@@ -116,23 +117,7 @@ export default function RegisterPage() {
         throw new Error("Erreur lors de l'échange de token")
       }
 
-      try {
-        // 2 — Sync extended profile to FastAPI
-        const { token, expires_at } = await api.post("/api/v1/auth/token", {
-          encrypted_key: encryptedData.encryptedKey,
-          iv: encryptedData.iv,
-          encrypted_data: encryptedData.encryptedData,
-        }) as AuthenApiResponse
-        api_token = token
-        console.log("Token", token)
-        console.log("Expires at", expires_at)
-
-      } catch (err) {
-        console.log("Erreur lors de l'échange de token", err)
-
-      }
-
-      // 3 — Create account via better-auth
+      // 2 — Create account via better-auth
       const result = await signUp.email({
         email: values.email.trim(),
         password: values.password,
@@ -144,7 +129,7 @@ export default function RegisterPage() {
       }
 
 
-      router.push(redirectTo)
+      router.push(redirectTo as any)
     } catch (err) {
       const msg = (err as Error).message ?? "Une erreur est survenue"
       const errorMessage = msg.toLowerCase().includes("already") || msg.toLowerCase().includes("email")

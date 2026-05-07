@@ -43,20 +43,13 @@ export default function LoginPage() {
       const result = await signIn.email({
         email: values.email.trim(),
         password: values.password,
+
       })
 
       if (result.error) throw new Error(result.error.message)
 
-      // Token exchange with FastAPI — one call, then FastAPI is autonomous
-      const encryptedData = await sendEncryptedCredentials({
-        email: values.email.trim(),
-        firstname: result.data.user.name,
-        lastname: result.data.user.name,
-        auth_provider: "email",
-      })
-      console.log(encryptedData)
 
-      //router.push(redirectTo)
+      router.push(redirectTo as any)
     } catch (err) {
       const msg = (err as Error).message ?? "Connexion échouée"
       setServerError(
