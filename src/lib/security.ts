@@ -89,8 +89,8 @@ export const dataToEncryption = async (data: any): Promise<EncryptedData | null 
 
 type EncryptedUserData = {
     email: string;
-    firstname: string;
-    lastname: string;
+    first_name: string;
+    last_name: string;
     professional_title?: string | null;
     auth_provider: "email" | "google" | "linkedin";
 }

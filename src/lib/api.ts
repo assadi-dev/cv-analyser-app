@@ -140,12 +140,12 @@ export async function apiExternalFetch<T>(
     }))
 
     // Token expired — clear it and redirect to login
-    if (res.status === 401) {
-      clearApiToken()
-      if (typeof window !== "undefined") {
-        window.location.href = "/login"
-      }
-    }
+    /*     if (res.status === 401) {
+          clearApiToken()
+          if (typeof window !== "undefined") {
+            window.location.href = "/login"
+          }
+        } */
 
     throw new ApiRequestError(
       res.status,

@@ -10,7 +10,7 @@ import {
   Globe, Linkedin, UserPlus, Check, Info,
 } from "lucide-react"
 import { signIn, signUp } from "@/lib/auth-client"
-import { exchangeToken, api } from "@/lib/api"
+import { exchangeToken, api, apiExternal } from "@/lib/api"
 import { Button } from "@/components/ui/Button"
 import { cn } from "@/lib/utils"
 import { registerSchema, passwordStrength, type RegisterFormValues } from "@/lib/schemas"
@@ -100,18 +100,21 @@ export default function RegisterPage() {
     setServerError(null)
     clearErrors()
 
-    let api_token: string
-
     try {
 
       // 1 — Token exchange with FastAPI (one-time bridge)
       const encryptedData = await sendEncryptedCredentials({
         email: values.email.trim(),
-        firstname: values.firstName.trim(),
-        lastname: values.lastName.trim(),
+        first_name: values.firstName.trim(),
+        last_name: values.lastName.trim(),
         professional_title: values.professionalTitle?.trim() || null,
         auth_provider: "email",
       })
+
+      if (encryptedData) {
+        await syncProfile(encryptedData)
+      }
+
 
       if (!encryptedData) {
         throw new Error("Erreur lors de l'échange de token")

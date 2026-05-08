@@ -90,8 +90,8 @@ export const exchangeToken = async (user: any) => {
   let expires_at = null
   const encryptedData = await sendEncryptedCredentials({
     email: user.email,
-    firstname: user.name?.split(" ")[0] || "",
-    lastname: user.name?.split(" ")[1] || "",
+    first_name: user.name?.split(" ")[0] || "",
+    last_name: user.name?.split(" ")[1] || "",
     auth_provider: "email",
   })
 

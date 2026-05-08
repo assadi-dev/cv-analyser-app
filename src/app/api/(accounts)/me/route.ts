@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { apiExternal } from "@/lib/api"
 
+export const dynamic = "force-dynamic"
+
 export async function GET(request: NextRequest) {
     const session = await auth.api.getSession({
         headers: request.headers,
@@ -20,7 +22,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(res)
     } catch (error) {
         console.error(error)
-        return NextResponse.json({ error: "Failed to create candidature" }, { status: 500 })
+        return NextResponse.json({ error: "Failed to fetch user account" }, { status: 500 })
     }
 
 }

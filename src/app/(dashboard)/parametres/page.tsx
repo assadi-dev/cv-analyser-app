@@ -13,20 +13,20 @@ import { cn } from "@/lib/utils"
 import type { User as UserType, AIProvider, CV } from "@/types"
 
 const SETTINGS_NAV = [
-  { id: "profile",    label: "Profil",                icon: User },
-  { id: "cvs",        label: "Mes CV",                icon: FileText },
-  { id: "ai",         label: "IA & Providers",        icon: Cpu },
-  { id: "platforms",  label: "Plateformes favorites", icon: Layers },
-  { id: "data",       label: "Données & Confidentialité", icon: Shield },
+  { id: "profile", label: "Profil", icon: User },
+  { id: "cvs", label: "Mes CV", icon: FileText },
+  { id: "ai", label: "IA & Providers", icon: Cpu },
+  { id: "platforms", label: "Plateformes favorites", icon: Layers },
+  { id: "data", label: "Données & Confidentialité", icon: Shield },
 ]
 
 const AI_PROVIDERS: { id: AIProvider; label: string; models: string[]; color: string; local?: boolean }[] = [
-  { id: "openai",      label: "OpenAI",      models: ["gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo"], color: "#10B981" },
-  { id: "anthropic",   label: "Anthropic",   models: ["claude-3-5-sonnet-20241022", "claude-3-haiku-20240307"], color: "#CC785C" },
-  { id: "groq",        label: "Groq",        models: ["llama-3.1-70b-versatile", "mixtral-8x7b-32768"], color: "#F97316" },
-  { id: "mistral",     label: "Mistral",     models: ["mistral-large-latest", "mistral-small-latest"], color: "#FF7000" },
-  { id: "openrouter",  label: "OpenRouter",  models: ["openai/gpt-4o", "anthropic/claude-3.5-sonnet"], color: "#6366F1" },
-  { id: "ollama",      label: "Ollama",      models: ["llama3.2", "mistral", "codellama"], color: "#1E293B", local: true },
+  { id: "openai", label: "OpenAI", models: ["gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo"], color: "#10B981" },
+  { id: "anthropic", label: "Anthropic", models: ["claude-3-5-sonnet-20241022", "claude-3-haiku-20240307"], color: "#CC785C" },
+  { id: "groq", label: "Groq", models: ["llama-3.1-70b-versatile", "mixtral-8x7b-32768"], color: "#F97316" },
+  { id: "mistral", label: "Mistral", models: ["mistral-large-latest", "mistral-small-latest"], color: "#FF7000" },
+  { id: "openrouter", label: "OpenRouter", models: ["openai/gpt-4o", "anthropic/claude-3.5-sonnet"], color: "#6366F1" },
+  { id: "ollama", label: "Ollama", models: ["llama3.2", "mistral", "codellama"], color: "#1E293B", local: true },
 ]
 
 const PLATFORMS = ["LinkedIn", "Welcome to the Jungle", "Indeed", "Apec", "Cadremploi", "Monster"]
@@ -34,34 +34,34 @@ const PLATFORMS = ["LinkedIn", "Welcome to the Jungle", "Indeed", "Apec", "Cadre
 export default function ParametresPage() {
   const router = useRouter()
   const [activeSection, setActiveSection] = useState("profile")
-  const [user, setUser]         = useState<UserType | null>(null)
-  const [cvs, setCVs]           = useState<CV[]>([])
-  const [saving, setSaving]     = useState(false)
+  const [user, setUser] = useState<UserType | null>(null)
+  const [cvs, setCVs] = useState<CV[]>([])
+  const [saving, setSaving] = useState(false)
 
   // Delete account
-  const [deleteOpen, setDeleteOpen]       = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState("")
-  const [deleting, setDeleting]           = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   // Profile form
   const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName]   = useState("")
-  const [title, setTitle]         = useState("")
+  const [lastName, setLastName] = useState("")
+  const [title, setTitle] = useState("")
 
   // AI form
   const [selectedProvider, setSelectedProvider] = useState<AIProvider>("openai")
-  const [selectedModel, setSelectedModel]       = useState("gpt-4o")
-  const [apiKey, setApiKey]                     = useState("")
-  const [showKey, setShowKey]                   = useState(false)
-  const [testing, setTesting]                   = useState(false)
-  const [testResult, setTestResult]             = useState<{ success: boolean; message: string } | null>(null)
+  const [selectedModel, setSelectedModel] = useState("gpt-4o")
+  const [apiKey, setApiKey] = useState("")
+  const [showKey, setShowKey] = useState(false)
+  const [testing, setTesting] = useState(false)
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null)
 
   // Preferences
-  const [atsThreshold, setAtsThreshold]       = useState(70)
-  const [favPlatforms, setFavPlatforms]       = useState<string[]>(["LinkedIn", "Welcome to the Jungle"])
+  const [atsThreshold, setAtsThreshold] = useState(70)
+  const [favPlatforms, setFavPlatforms] = useState<string[]>(["LinkedIn", "Welcome to the Jungle"])
 
   useEffect(() => {
-    api.get<UserType>("/api/v1/settings/me").then((u) => {
+    api.get<UserType>("/api/me").then((u) => {
       setUser(u)
       setFirstName(u.first_name ?? "")
       setLastName(u.last_name ?? "")
@@ -70,19 +70,19 @@ export default function ParametresPage() {
       setSelectedModel(u.ai_model)
       setAtsThreshold(u.ats_threshold)
     }).catch(console.error)
-    api.get<CV[]>("/api/v1/cvs").then(setCVs).catch(console.error)
+    api.get<CV[]>("/api/cvs").then(setCVs).catch(console.error)
   }, [])
 
   async function saveProfile() {
     setSaving(true)
-    await api.patch("/api/v1/settings/profile", { first_name: firstName, last_name: lastName, professional_title: title })
+    await api.patch("/api/account/profile", { first_name: firstName, last_name: lastName, professional_title: title })
     setSaving(false)
   }
 
   async function testProvider() {
     setTesting(true)
     setTestResult(null)
-    const res = await api.post<{ success: boolean; message: string }>("/api/v1/settings/ai-provider/test", {})
+    const res = await api.post<{ success: boolean; message: string }>("/api/account/ai-provider/test", {})
     setTestResult(res)
     setTesting(false)
   }
@@ -158,7 +158,7 @@ export default function ParametresPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <Input label="Prénom" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-              <Input label="Nom"    value={lastName}  onChange={(e) => setLastName(e.target.value)} />
+              <Input label="Nom" value={lastName} onChange={(e) => setLastName(e.target.value)} />
             </div>
             <div className="mt-4">
               <Input label="Titre professionnel" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Développeur Full Stack" />

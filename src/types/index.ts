@@ -30,13 +30,17 @@ export type AIProvider = "openai" | "anthropic" | "groq" | "mistral" | "openrout
 
 export interface CV {
   id: string
-  user_id: string
   name: string
   file_size_kb: number
   mime_type: string
   is_default: boolean
+  key: string
   created_at: string
   updated_at: string
+}
+
+export interface CVSummary extends Omit<CV, "key"> {
+  url: string
 }
 
 // ─── Candidature ─────────────────────────────────────────────────────────────
