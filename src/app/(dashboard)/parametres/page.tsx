@@ -6,7 +6,7 @@ import { User, FileText, Cpu, Layers, Shield, Check, Zap, Key, EyeOff, Eye, Tras
 import { api } from "@/lib/api"
 import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/Button"
-import { Input } from "@/components/ui/Input"
+import { Input } from "@/components/ui/input"
 import { Card, CardHeader } from "@/components/ui/Card"
 import { Modal } from "@/components/ui/Modal"
 import { cn } from "@/lib/utils"

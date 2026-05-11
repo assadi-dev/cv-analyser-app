@@ -5,7 +5,7 @@ import { FileText, Briefcase, Zap, CloudUpload, Target, CheckCircle, AlertTriang
 import { useSSE } from "@/hooks/useSSE"
 import { useAnalyseStore } from "@/store/analyse.store"
 import { Button } from "@/components/ui/Button"
-import { Textarea } from "@/components/ui/Input"
+import { Textarea } from "@/components/ui/textarea"
 import { Card, CardHeader } from "@/components/ui/Card"
 import { Badge, ScoreBadge } from "@/components/ui/Badge"
 import { cn, scoreColor } from "@/lib/utils"
