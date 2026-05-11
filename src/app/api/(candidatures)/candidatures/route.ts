@@ -22,7 +22,7 @@ export async function GET(request: Request) {
         status: searchParams.get("status") as CandidatureStatus | "all"
     }
     try {
-        const res = await apiExternal.get<PaginatedResponse<CandidatureSummary>>(`/api/v1/candidatures?page=${params.page}&page_size=${params.pageSize}&status=${params.status}`, options)
+        const res = await apiExternal.get<PaginatedResponse<CandidatureSummary>>(`/api/v1/candidatures?page=${params.page}&page_size=${params.pageSize}`, options)
         return NextResponse.json(res)
     } catch (error) {
         console.error(error)

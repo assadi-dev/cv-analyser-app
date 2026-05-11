@@ -9,18 +9,18 @@ import type {
 } from "@/types"
 
 export interface CreateCandidaturePayload {
-  company_name:    string
-  company_city?:   string | null
-  job_title:       string
-  contract_type:   ContractType
-  work_mode:       WorkMode
+  company_name: string
+  company_city?: string | null
+  job_title: string
+  contract_type: ContractType
+  work_mode: WorkMode
   source_platform?: string | null
-  source_name?:    string | null
-  source_url?:     string | null
-  status:          CandidatureStatus
-  notes?:          string | null
-  cv_id?:          string | null
-  contacts?:       { name: string; contact_type: ContactType; value: string }[]
+  source_name?: string | null
+  source_url?: string | null
+  status: CandidatureStatus
+  notes?: string | null
+  cv_id?: string | null
+  contacts?: { name: string; contact_type: ContactType; value: string }[]
 }
 
 export const CANDIDATURES_QUERY_KEY = "candidatures"
@@ -49,4 +49,4 @@ export const deleteCandidature = (id: string): Promise<void> =>
 export const createCandidature = (
   payload: CreateCandidaturePayload
 ): Promise<CandidatureSummary> =>
-  api.post<CandidatureSummary>("/api/candidatures", payload)
+  api.post<CandidatureSummary>("/api/candidature", payload)
