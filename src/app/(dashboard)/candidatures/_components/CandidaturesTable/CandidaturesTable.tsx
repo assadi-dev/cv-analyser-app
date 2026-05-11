@@ -1,0 +1,53 @@
+import type { CandidatureSummary } from "@/types"
+import { CandidaturesTableHeader } from "./CandidaturesTableHeader"
+import { CandidaturesTableRow } from "./CandidaturesTableRow"
+import { CandidaturesTableSkeleton } from "./CandidaturesTableSkeleton"
+import { CandidaturesEmptyState } from "./CandidaturesEmptyState"
+import { CandidaturesPagination } from "./CandidaturesPagination"
+
+interface CandidaturesTableProps {
+  items: CandidatureSummary[]
+  isLoading: boolean
+  page: number
+  total: number
+  onPageChange: (page: number) => void
+  onDelete: (id: string) => void
+  onView: (id: string) => void
+}
+
+export function CandidaturesTable({
+  items,
+  isLoading,
+  page,
+  total,
+  onPageChange,
+  onDelete,
+  onView,
+}: CandidaturesTableProps) {
+  return (
+    <div
+      className="rounded-[14px] border overflow-hidden shadow-[var(--shadow-card)]"
+      style={{ borderColor: "var(--color-border)", background: "white" }}
+    >
+      <CandidaturesTableHeader />
+
+      {isLoading ? (
+        <CandidaturesTableSkeleton />
+      ) : items.length === 0 ? (
+        <CandidaturesEmptyState />
+      ) : (
+        items.map((item, i) => (
+          <CandidaturesTableRow
+            key={item.id}
+            item={item}
+            index={i}
+            onDelete={onDelete}
+            onView={onView}
+          />
+        ))
+      )}
+
+      <CandidaturesPagination page={page} total={total} onPageChange={onPageChange} />
+    </div>
+  )
+}
