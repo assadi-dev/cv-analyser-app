@@ -1,4 +1,7 @@
+"use client"
+
 import type { CandidatureSummary } from "@/types"
+import { useCandidaturesTable } from "../../_hooks/useCandidaturesTable"
 import { CandidaturesTableHeader } from "./CandidaturesTableHeader"
 import { CandidaturesTableRow } from "./CandidaturesTableRow"
 import { CandidaturesTableSkeleton } from "./CandidaturesTableSkeleton"
@@ -24,30 +27,35 @@ export function CandidaturesTable({
   onDelete,
   onView,
 }: CandidaturesTableProps) {
+  const table = useCandidaturesTable({
+    data: items,
+    total,
+    page,
+    onPageChange,
+    onDelete,
+    onView,
+  })
+
+  const rows = table.getRowModel().rows
+
   return (
     <div
       className="rounded-[14px] border overflow-hidden shadow-[var(--shadow-card)]"
       style={{ borderColor: "var(--color-border)", background: "white" }}
     >
-      <CandidaturesTableHeader />
+      <CandidaturesTableHeader headerGroups={table.getHeaderGroups()} />
 
       {isLoading ? (
         <CandidaturesTableSkeleton />
-      ) : items.length === 0 ? (
+      ) : rows.length === 0 ? (
         <CandidaturesEmptyState />
       ) : (
-        items.map((item, i) => (
-          <CandidaturesTableRow
-            key={item.id}
-            item={item}
-            index={i}
-            onDelete={onDelete}
-            onView={onView}
-          />
+        rows.map((row, i) => (
+          <CandidaturesTableRow key={row.id} row={row} index={i} />
         ))
       )}
 
-      <CandidaturesPagination page={page} total={total} onPageChange={onPageChange} />
+      <CandidaturesPagination table={table} total={total} />
     </div>
   )
 }

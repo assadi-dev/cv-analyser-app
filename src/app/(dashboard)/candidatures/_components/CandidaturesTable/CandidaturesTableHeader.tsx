@@ -1,23 +1,35 @@
+import { flexRender, type HeaderGroup } from "@tanstack/react-table"
+import type { CandidatureSummary } from "@/types"
+
 export const TABLE_GRID = "220px 1fr 110px 110px 120px 140px 80px"
 
-export function CandidaturesTableHeader() {
+interface CandidaturesTableHeaderProps {
+  headerGroups: HeaderGroup<CandidatureSummary>[]
+}
+
+export function CandidaturesTableHeader({ headerGroups }: CandidaturesTableHeaderProps) {
   return (
-    <div
-      className="grid text-[11px] font-bold tracking-wide h-11 px-5 items-center border-b"
-      style={{
-        gridTemplateColumns: TABLE_GRID,
-        borderColor: "var(--color-border)",
-        background: "var(--color-surface-muted)",
-        color: "var(--color-text-subtle)",
-      }}
-    >
-      <span>Entreprise</span>
-      <span>Poste</span>
-      <span>Score</span>
-      <span>ATS</span>
-      <span>Date</span>
-      <span>Statut</span>
-      <span className="text-center">Actions</span>
-    </div>
+    <>
+      {headerGroups.map((headerGroup) => (
+        <div
+          key={headerGroup.id}
+          className="grid text-[11px] font-bold tracking-wide h-11 px-5 items-center border-b"
+          style={{
+            gridTemplateColumns: TABLE_GRID,
+            borderColor: "var(--color-border)",
+            background: "var(--color-surface-muted)",
+            color: "var(--color-text-subtle)",
+          }}
+        >
+          {headerGroup.headers.map((header) => (
+            <div key={header.id}>
+              {header.isPlaceholder
+                ? null
+                : flexRender(header.column.columnDef.header, header.getContext())}
+            </div>
+          ))}
+        </div>
+      ))}
+    </>
   )
 }
