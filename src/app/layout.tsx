@@ -1,5 +1,7 @@
 import type { Metadata } from "next"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
+import { Toaster } from "sonner"
+import { QueryProvider } from "@/components/providers/QueryProvider"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -15,7 +17,12 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body>
-        <NuqsAdapter>{children}</NuqsAdapter>
+        <NuqsAdapter>
+          <QueryProvider>
+            {children}
+            <Toaster richColors position="bottom-right" />
+          </QueryProvider>
+        </NuqsAdapter>
       </body>
     </html>
   )
