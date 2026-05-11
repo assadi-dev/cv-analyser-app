@@ -10,7 +10,7 @@ export function useDeleteCandidature() {
   const toast = useToast()
 
   return useMutation({
-    mutationFn: (id: string) => deleteCandidature(id),
+    mutationFn: (ids: string[]) => deleteCandidature(ids),
     onError: (error) => {
       logError(error, "useDeleteCandidature")
       toast.error("Impossible de supprimer la candidature")

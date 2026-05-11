@@ -43,8 +43,8 @@ export const fetchCandidatures = ({
   return api.get<PaginatedResponse<CandidatureSummary>>(`/api/candidatures?${params}`)
 }
 
-export const deleteCandidature = (id: string): Promise<void> =>
-  api.delete(`/api/candidatures/${id}`)
+export const deleteCandidature = (ids: string[]): Promise<void> =>
+  api.delete(`/api/candidature`, { ids })
 
 export const createCandidature = (
   payload: CreateCandidaturePayload

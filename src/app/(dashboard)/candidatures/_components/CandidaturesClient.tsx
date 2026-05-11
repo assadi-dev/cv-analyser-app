@@ -23,10 +23,10 @@ export function CandidaturesClient() {
     () =>
       search
         ? candidatures.filter(
-            (c) =>
-              c.company_name.toLowerCase().includes(search.toLowerCase()) ||
-              c.job_title.toLowerCase().includes(search.toLowerCase())
-          )
+          (c) =>
+            c.company_name.toLowerCase().includes(search.toLowerCase()) ||
+            c.job_title.toLowerCase().includes(search.toLowerCase())
+        )
         : candidatures,
     [candidatures, search]
   )
@@ -35,7 +35,7 @@ export function CandidaturesClient() {
 
   const handleDeleteConfirm = () => {
     if (!deleteModal.modalProps) return
-    deleteMutation(deleteModal.modalProps, { onSuccess: deleteModal.close })
+    deleteMutation([deleteModal.modalProps], { onSuccess: deleteModal.close })
   }
 
   const handleView = (_id: string) => {

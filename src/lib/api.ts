@@ -120,8 +120,6 @@ export async function apiExternalFetch<T>(
   path: string,
   options: FetchOptions = {},
 ): Promise<T> {
-
-
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...options.headers,
@@ -177,8 +175,8 @@ export const api = {
   put: <T>(path: string, body: unknown) =>
     apiFetch<T>(path, { method: "PUT", body: JSON.stringify(body) }),
 
-  delete: <T>(path: string) =>
-    apiFetch<T>(path, { method: "DELETE" }),
+  delete: <T>(path: string, body?: unknown) =>
+    apiFetch<T>(path, { method: "DELETE", body: body ? JSON.stringify(body) : undefined }),
 
   upload: <T>(path: string, formData: FormData) =>
     apiFetch<T>(path, {
