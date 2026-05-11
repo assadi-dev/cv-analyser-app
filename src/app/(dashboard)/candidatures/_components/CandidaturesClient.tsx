@@ -10,12 +10,14 @@ import { FilterBar } from "./FilterBar/FilterBar"
 import { StatusTabs } from "./StatusTabs/StatusTabs"
 import { CandidaturesTable } from "./CandidaturesTable/CandidaturesTable"
 import { DeleteConfirmModal } from "./modals/DeleteConfirmModal"
+import { AddCandidatureModal } from "./modals/AddCandidatureModal"
 
 export function CandidaturesClient() {
   const { page, status, search, setPage, setStatus, setSearch } = useCandidaturesParams()
   const { candidatures, total, isLoading } = useCandidatures({ page, status })
   const { mutate: deleteMutation, isPending: isDeleting } = useDeleteCandidature()
   const deleteModal = useModal<string>()
+  const addModal = useModal()
 
   const filtered = useMemo(
     () =>
@@ -40,9 +42,7 @@ export function CandidaturesClient() {
     // TODO: navigate to candidature detail
   }
 
-  const handleAdd = () => {
-    // TODO: open add candidature modal
-  }
+  const handleAdd = () => addModal.open()
 
   return (
     <div className="flex flex-col gap-5 p-4 sm:p-8">
@@ -67,6 +67,11 @@ export function CandidaturesClient() {
         onClose={deleteModal.close}
         onConfirm={handleDeleteConfirm}
         isPending={isDeleting}
+      />
+
+      <AddCandidatureModal
+        isOpen={addModal.isOpen}
+        onClose={addModal.close}
       />
     </div>
   )
