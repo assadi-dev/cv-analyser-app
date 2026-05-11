@@ -95,3 +95,38 @@ Utiliser better-auth pour l'authentification.
 apres l'authentification, rediriger l'utilisateur vers la page d'accueil.
 apres la deconnexion, rediriger l'utilisateur vers la page de connexion.
 apres la creation d'un compte, rediriger l'utilisateur vers la page d'accueil.
+
+# External API
+Utiliser fetch pour les appels api externes.
+les appels api externes doivent etre dans le dossier _api de la page.
+les queryKey doivent etre des constantes dans le dossier _api de la page.
+
+exemple :
+
+_api/api.ts
+export const fetchJobs = async()=>{
+  const response = await fetch("/api/jobs");
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error("Failed to fetch jobs");
+  }
+  return data;
+}
+
+
+export const GET_JOBS_QUERY_KEY = "jobs";
+
+export const useGetJobs = () => {
+ const {data, isLoading, error} = useQuery({
+    queryKey: [GET_JOBS_QUERY_KEY],
+    queryFn: () => fetchJobs(),
+  });
+  return {data, isLoading, error};
+};
+
+# Refactorisation
+Refactoriser l’ensemble du projet en une architecture modulaire, cohérente et maintenable sur toutes les pages et fonctionnalités : analyser la base de code existante puis extraire, fusionner ou découper les éléments en composants réutilisables et cohérents, en privilégiant un composant unique par responsabilité métier lorsque pertinent. Appliquer strictement les principes SOLID (responsabilité unique, extensibilité, inversion des dépendances, séparation des préoccupations, etc.).
+Standardiser l’organisation du projet en plaçant les composants UI dans des dossiers _components au plus proche de leur contexte fonctionnel, avec des sous-dossiers internes si plusieurs composants appartiennent au même domaine métier.
+Externaliser toute logique métier, gestion d’état, appels API, transformations de données ou effets secondaires dans des hooks custom situés dans des dossiers _hooks dédiés.
+Mutualiser les éléments transverses (UI partagée, utilitaires, constantes, types, services, providers) dans une structure globale claire et évolutive.
+Garantir un code lisible, scalable, testable, performant et homogène sur l’ensemble du projet, tout en respectant les bonnes pratiques du framework utilisé (React / Next.js / TypeScript si applicable).
