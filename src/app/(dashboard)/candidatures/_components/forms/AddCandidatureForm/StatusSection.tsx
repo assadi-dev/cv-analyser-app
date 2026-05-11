@@ -37,20 +37,12 @@ export function StatusSection() {
       <FormField
         control={form.control}
         name="status"
-        render={({ field }) => {
-          const dot = STATUS_OPTIONS.find((o) => o.value === field.value)?.dot ?? "#64748B"
-          return (
+        render={({ field }) => (
             <FormItem className="space-y-0">
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger className={SELECT_TRIGGER_CLS}>
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <span
-                        className="w-[7px] h-[7px] rounded-full shrink-0"
-                        style={{ background: dot }}
-                      />
-                      <SelectValue />
-                    </div>
+                    <SelectValue />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className={SELECT_CONTENT_CLS}>
@@ -66,7 +58,7 @@ export function StatusSection() {
               </Select>
             </FormItem>
           )
-        }}
+        }
       />
     </div>
   )
