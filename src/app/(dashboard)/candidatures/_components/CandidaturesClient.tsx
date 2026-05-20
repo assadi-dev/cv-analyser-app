@@ -4,6 +4,7 @@ import { useMemo } from "react"
 import { useModal } from "@/hooks/useModal"
 import { useCandidaturesParams } from "../_hooks/useCandidaturesParams"
 import { useCandidatures } from "../_hooks/useCandidatures"
+import { useAddCandidature } from "../_hooks/useAddCandidature"
 import { useDeleteCandidature } from "../_hooks/useDeleteCandidature"
 import { CandidaturesHeader } from "./CandidaturesHeader"
 import { FilterBar } from "./FilterBar/FilterBar"
@@ -11,10 +12,12 @@ import { StatusTabs } from "./StatusTabs/StatusTabs"
 import { CandidaturesTable } from "./CandidaturesTable/CandidaturesTable"
 import { DeleteConfirmModal } from "./modals/DeleteConfirmModal"
 import { AddCandidatureModal } from "./modals/AddCandidatureModal"
+import type { AddCandidatureFormValues } from "../_lib/add-candidature.schema"
 
 export function CandidaturesClient() {
   const { page, status, search, setPage, setStatus, setSearch } = useCandidaturesParams()
   const { candidatures, total, isLoading } = useCandidatures({ page, status })
+  const { mutate: addMutation, isPending: isAdding } = useAddCandidature()
   const { mutate: deleteMutation, isPending: isDeleting } = useDeleteCandidature()
   const deleteModal = useModal<string>()
   const addModal = useModal()
@@ -44,6 +47,10 @@ export function CandidaturesClient() {
 
   const handleAdd = () => addModal.open()
 
+  const handleAddSubmit = (values: AddCandidatureFormValues) => {
+    addMutation(values, { onSuccess: addModal.close })
+  }
+
   return (
     <div className="flex flex-col gap-5 p-4 sm:p-8">
       <CandidaturesHeader onAdd={handleAdd} />
@@ -72,6 +79,8 @@ export function CandidaturesClient() {
       <AddCandidatureModal
         isOpen={addModal.isOpen}
         onClose={addModal.close}
+        onSubmit={handleAddSubmit}
+        isPending={isAdding}
       />
     </div>
   )

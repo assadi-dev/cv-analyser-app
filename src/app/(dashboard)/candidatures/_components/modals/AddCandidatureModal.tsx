@@ -3,7 +3,6 @@
 import { Plus } from "lucide-react"
 import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
-import { useAddCandidature } from "../../_hooks/useAddCandidature"
 import { AddCandidatureForm } from "../forms/AddCandidatureForm"
 import type { AddCandidatureFormValues } from "../../_lib/add-candidature.schema"
 
@@ -12,15 +11,11 @@ const FORM_ID = "add-candidature-form"
 interface AddCandidatureModalProps {
   isOpen: boolean
   onClose: () => void
+  onSubmit: (values: AddCandidatureFormValues) => void
+  isPending: boolean
 }
 
-export function AddCandidatureModal({ isOpen, onClose }: AddCandidatureModalProps) {
-  const { mutate, isPending } = useAddCandidature()
-
-  const handleSubmit = (values: AddCandidatureFormValues) => {
-    mutate(values, { onSuccess: onClose })
-  }
-
+export function AddCandidatureModal({ isOpen, onClose, onSubmit, isPending }: AddCandidatureModalProps) {
   return (
     <Modal
       open={isOpen}
@@ -40,7 +35,7 @@ export function AddCandidatureModal({ isOpen, onClose }: AddCandidatureModalProp
         </>
       }
     >
-      <AddCandidatureForm formId={FORM_ID} onSubmit={handleSubmit} />
+      <AddCandidatureForm formId={FORM_ID} onSubmit={onSubmit} />
     </Modal>
   )
 }
