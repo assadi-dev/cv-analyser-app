@@ -27,16 +27,7 @@ export function CandidaturesTable({
   onDelete,
   onView,
 }: CandidaturesTableProps) {
-  const table = useCandidaturesTable({
-    data: items,
-    total,
-    page,
-    onPageChange,
-    onDelete,
-    onView,
-  })
-
-  const rows = table.getRowModel().rows
+  const table = useCandidaturesTable({ data: items, total, page, onPageChange, onDelete, onView })
 
   return (
     <div
@@ -47,11 +38,17 @@ export function CandidaturesTable({
 
       {isLoading ? (
         <CandidaturesTableSkeleton />
-      ) : rows.length === 0 ? (
+      ) : items.length === 0 ? (
         <CandidaturesEmptyState />
       ) : (
-        rows.map((row, i) => (
-          <CandidaturesTableRow key={row.id} row={row} index={i} />
+        items.map((item, i) => (
+          <CandidaturesTableRow
+            key={item.id}
+            item={item}
+            index={i}
+            onDelete={onDelete}
+            onView={onView}
+          />
         ))
       )}
 

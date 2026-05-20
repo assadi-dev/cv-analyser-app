@@ -31,8 +31,11 @@ export function CandidaturesClient() {
             c.job_title.toLowerCase().includes(search.toLowerCase())
         )
         : candidatures,
-    [candidatures, search]
+    [candidatures, search, isLoading]
   )
+
+  console.log(filtered.length);
+
 
   const handleDeleteRequest = (id: string) => deleteModal.open(id)
 
@@ -59,7 +62,7 @@ export function CandidaturesClient() {
 
       <StatusTabs active={status} total={total} onTabChange={setStatus} />
 
-      <CandidaturesTable
+      {filtered.length > 0 ? <CandidaturesTable
         items={filtered}
         isLoading={isLoading}
         page={page}
@@ -67,7 +70,7 @@ export function CandidaturesClient() {
         onPageChange={setPage}
         onDelete={handleDeleteRequest}
         onView={handleView}
-      />
+      /> : <p>Aucune candidature</p>}
 
       <DeleteConfirmModal
         isOpen={deleteModal.isOpen}

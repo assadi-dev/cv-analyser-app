@@ -9,6 +9,7 @@ import {
   type CreateCandidaturePayload,
 } from "../_api/candidatures.api"
 import type { AddCandidatureFormValues } from "../_lib/add-candidature.schema"
+import type { PaginatedResponse, CandidatureSummary } from "@/types"
 
 function toPayload(values: AddCandidatureFormValues): CreateCandidaturePayload {
   return {
@@ -34,7 +35,18 @@ export function useAddCandidature() {
   return useMutation({
     mutationFn: (values: AddCandidatureFormValues) =>
       createCandidature(toPayload(values)),
-    onSuccess: () => {
+    onSuccess: (newItem) => {
+      queryClient.setQueriesData<PaginatedResponse<CandidatureSummary>>(
+        { queryKey: [CANDIDATURES_QUERY_KEY] },
+        (old) => {
+          if (!old) return old
+          return {
+            ...old,
+            items: [newItem, ...old.items],
+            total: old.total + 1,
+          }
+        }
+      )
       queryClient.invalidateQueries({ queryKey: [CANDIDATURES_QUERY_KEY] })
       toast.success("Candidature ajoutée")
     },
