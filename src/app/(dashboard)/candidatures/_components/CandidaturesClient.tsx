@@ -34,7 +34,6 @@ export function CandidaturesClient() {
     [candidatures, search, isLoading]
   )
 
-  console.log(filtered.length);
 
 
   const handleDeleteRequest = (id: string) => deleteModal.open(id)
