@@ -61,8 +61,7 @@ export function CandidaturesClient() {
       <FilterBar search={search} onSearchChange={setSearch} />
 
       <StatusTabs active={status} total={total} onTabChange={setStatus} />
-
-      {filtered.length > 0 ? <CandidaturesTable
+      <CandidaturesTable
         items={filtered}
         isLoading={isLoading}
         page={page}
@@ -70,7 +69,7 @@ export function CandidaturesClient() {
         onPageChange={setPage}
         onDelete={handleDeleteRequest}
         onView={handleView}
-      /> : <p>Aucune candidature</p>}
+      />
 
       <DeleteConfirmModal
         isOpen={deleteModal.isOpen}
