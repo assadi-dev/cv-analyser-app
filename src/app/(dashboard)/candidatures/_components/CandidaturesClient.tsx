@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { useModal } from "@/hooks/useModal"
 import { useCandidaturesParams } from "../_hooks/useCandidaturesParams"
 import { useCandidatures } from "../_hooks/useCandidatures"
@@ -36,22 +36,22 @@ export function CandidaturesClient() {
 
 
 
-  const handleDeleteRequest = (id: string) => deleteModal.open(id)
+  const handleDeleteRequest = useCallback((id: string) => deleteModal.open(id), [deleteModal.open])
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = useCallback(() => {
     if (!deleteModal.modalProps) return
     deleteMutation([deleteModal.modalProps], { onSuccess: deleteModal.close })
-  }
+  }, [deleteModal.modalProps, deleteModal.close, deleteMutation])
 
-  const handleView = (_id: string) => {
+  const handleView = useCallback((_id: string) => {
     // TODO: navigate to candidature detail
-  }
+  }, [])
 
-  const handleAdd = () => addModal.open()
+  const handleAdd = useCallback(() => addModal.open(), [addModal.open])
 
-  const handleAddSubmit = (values: AddCandidatureFormValues) => {
+  const handleAddSubmit = useCallback((values: AddCandidatureFormValues) => {
     addMutation(values, { onSuccess: addModal.close })
-  }
+  }, [addMutation, addModal.close])
 
   return (
     <div className="flex flex-col gap-5 p-4 sm:p-8">

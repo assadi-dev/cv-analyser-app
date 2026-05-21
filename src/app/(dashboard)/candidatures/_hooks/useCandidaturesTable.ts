@@ -41,6 +41,7 @@ export function useCandidaturesTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row.id,
     manualPagination: true,
     pageCount: Math.ceil(total / PAGE_SIZE),
     state: { pagination },
