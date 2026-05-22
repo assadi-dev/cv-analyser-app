@@ -9,6 +9,9 @@ export type AnalyseStreamSchemaInfer = z.infer<typeof analyseStreamSchema>
 
 
 export const analyseStreamDecoder = {
-    temporary_analyse_input: (inputs: unknown) => analyseStreamSchema.safeParse(inputs),
+    temporary_analyse_input: (inputs: FormData) => analyseStreamSchema.safeParse({
+        job_description: inputs.get("job_description"),
+        cv_file: inputs.get("cv_file"),
+    }),
 
 }

@@ -12,7 +12,8 @@ export const POST = async (req: NextRequest) => {
             headers: req.headers,
         })
         const options = await headersStructureFromSession(session)
-        const body = await req.json();
+        const body = await req.formData();
+
 
         const parsedBody = analyseStreamDecoder.temporary_analyse_input(body)
         if (!parsedBody.success) {
@@ -26,10 +27,18 @@ export const POST = async (req: NextRequest) => {
 
         const res = await apiExternal.multipart(`/api/v1/analyses/temporary/stream`, formData, options)
 
+        const stream = res.body;
 
-        return NextResponse.json({ message: "dd" })
+
+        return new NextResponse(stream, {
+            headers: {
+                "Content-Type": "text/event-stream",
+                "Cache-Control": "no-cache, no-transform",
+                "Connection": "keep-alive",
+            },
+        })
     } catch (error) {
-        console.log(error)
+        console.error(error)
         return NextResponse.json({ error: "Failed to fetch analysis" }, { status: 500 });
     }
 }

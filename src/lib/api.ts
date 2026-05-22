@@ -172,6 +172,7 @@ export async function apiExternalFetchMultipart(
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
     headers,
+    method: "POST",
     body,
   })
 
