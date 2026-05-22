@@ -11,18 +11,19 @@ import { Badge, ScoreBadge } from "@/components/ui/Badge"
 import { cn, scoreColor } from "@/lib/utils"
 import { api } from "@/lib/api"
 import type { SSEEvent, SSEResultEvent, ChatMessage } from "@/types"
+import { Input } from "@/components/ui/input"
 
 const STEP_LABELS: Record<string, string> = {
-  parsing:         "Analyse des documents...",
-  ats:             "Calcul du score ATS...",
-  scoring:         "Évaluation sémantique...",
+  parsing: "Analyse des documents...",
+  ats: "Calcul du score ATS...",
+  scoring: "Évaluation sémantique...",
   recommendations: "Génération des recommandations...",
 }
 
 export default function AnalyserPage() {
-  const [cvText, setCvText]           = useState("")
-  const [jobText, setJobText]         = useState("")
-  const [chatInput, setChatInput]     = useState("")
+  const [cvFile, setCvFile] = useState<File | null>(null)
+  const [jobText, setJobText] = useState("")
+  const [chatInput, setChatInput] = useState("")
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
   const [chatLoading, setChatLoading] = useState(false)
 
@@ -40,15 +41,14 @@ export default function AnalyserPage() {
   const isStreaming = sseState.status === "streaming" || sseState.status === "connecting"
 
   function handleAnalyse() {
-    if (!cvText.trim() || !jobText.trim()) return
+    if (!cvFile || !jobText.trim()) return
     setLiveResult(null as any)
     reset()
 
     // TODO: attach a real candidature_id — for now use a placeholder
-    start("/api/v1/analyses/stream", {
-      candidature_id: "00000000-0000-0000-0000-000000000001",
+    start("/api/ia/analyse-stream", {
       job_description: jobText,
-      cv_text: cvText,
+      cv_file: cvFile,
     })
   }
 
@@ -86,12 +86,12 @@ export default function AnalyserPage() {
           <CardHeader
             icon={<FileText size={15} style={{ color: "var(--color-primary)" }} />}
             title="CV du Candidat"
-            action={<Badge variant="purple">Texte</Badge>}
+            action={<Badge variant="purple">PDF</Badge>}
           />
-          <Textarea
-            placeholder="Collez le contenu de votre CV ici (compétences, expériences, formations)..."
-            value={cvText}
-            onChange={(e) => setCvText(e.target.value)}
+          <Input
+            type="file"
+            accept=".pdf"
+            onChange={(e) => setCvFile(e.target.files?.[0] ?? null)}
             className="min-h-[120px]"
           />
         </Card>
@@ -116,7 +116,7 @@ export default function AnalyserPage() {
           className="w-full"
           onClick={handleAnalyse}
           loading={isStreaming}
-          disabled={!cvText.trim() || !jobText.trim()}
+          disabled={!cvFile || !jobText.trim()}
         >
           <Zap size={20} />
           {isStreaming ? (STEP_LABELS[sseState.currentStep ?? ""] ?? "Analyse en cours...") : "Analyser la compatibilité"}
@@ -171,9 +171,9 @@ export default function AnalyserPage() {
               {/* Mini score grid */}
               <div className="grid grid-cols-3 gap-3 mb-4">
                 {[
-                  { label: "Score ATS",    value: result.score_ats },
-                  { label: "Compétences",  value: result.score_competences },
-                  { label: "Expérience",   value: result.score_experience },
+                  { label: "Score ATS", value: result.score_ats },
+                  { label: "Compétences", value: result.score_competences },
+                  { label: "Expérience", value: result.score_experience },
                 ].map((s) => (
                   <div key={s.label} className="flex flex-col gap-1.5 p-3 rounded-[10px]" style={{ background: "var(--color-surface-muted)" }}>
                     <span className="text-[11px]" style={{ color: "var(--color-text-subtle)" }}>{s.label}</span>
@@ -231,7 +231,7 @@ export default function AnalyserPage() {
                 const colorMap = {
                   warning: { bg: "var(--color-warning-light)", border: "#FED7AA", text: "var(--color-warning-text)", Icon: AlertTriangle },
                   success: { bg: "var(--color-success-light)", border: "#BBF7D0", text: "var(--color-success-text)", Icon: CheckCircle },
-                  info:    { bg: "var(--color-primary-light)", border: "#C7D2FE", text: "var(--color-primary)",      Icon: Lightbulb },
+                  info: { bg: "var(--color-primary-light)", border: "#C7D2FE", text: "var(--color-primary)", Icon: Lightbulb },
                 }
                 const style = colorMap[reco.type as keyof typeof colorMap] ?? colorMap.info
                 return (

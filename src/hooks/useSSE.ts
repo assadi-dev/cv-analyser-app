@@ -17,11 +17,11 @@ export interface SSEState {
 }
 
 const INITIAL_STATE: SSEState = {
-  status:      "idle",
-  progress:    0,
+  status: "idle",
+  progress: 0,
   currentStep: null,
-  error:       null,
-  analyseId:   null,
+  error: null,
+  analyseId: null,
 }
 
 /**
@@ -36,7 +36,7 @@ export function useSSE(onEvent?: (event: SSEEvent) => void) {
   const [state, setState] = useState<SSEState>(INITIAL_STATE)
   const abortRef = useRef<AbortController | null>(null)
 
-  async function start(url: string, body: Record<string, unknown>) {
+  async function start(url: string, body: { job_description: string, cv_file: File }) {
     // Cancel any in-progress stream
     abortRef.current?.abort()
     const controller = new AbortController()
@@ -45,16 +45,15 @@ export function useSSE(onEvent?: (event: SSEEvent) => void) {
     setState({ ...INITIAL_STATE, status: "connecting" })
 
     const token = getApiToken()
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL ?? ""}${url}`
+    const apiUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? ""}${url}`
+    const formData = new FormData()
+    formData.append("job_description", body.job_description)
+    formData.append("cv_file", body.cv_file)
 
     try {
       const res = await fetch(apiUrl, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(body),
+        body: formData,
         signal: controller.signal,
       })
 
@@ -92,21 +91,21 @@ export function useSSE(onEvent?: (event: SSEEvent) => void) {
             if (event.type === "progress") {
               setState((s) => ({
                 ...s,
-                progress:    event.progress,
+                progress: event.progress,
                 currentStep: event.step,
               }))
             } else if (event.type === "done") {
               setState((s) => ({
                 ...s,
-                status:    "done",
-                progress:  100,
+                status: "done",
+                progress: 100,
                 analyseId: event.analyse_id,
               }))
             } else if (event.type === "error") {
               setState((s) => ({
                 ...s,
                 status: "error",
-                error:  event.message,
+                error: event.message,
               }))
             }
           } catch {
@@ -121,7 +120,7 @@ export function useSSE(onEvent?: (event: SSEEvent) => void) {
       setState((s) => ({
         ...s,
         status: "error",
-        error:  (err as Error).message ?? "Streaming error",
+        error: (err as Error).message ?? "Streaming error",
       }))
     }
   }
