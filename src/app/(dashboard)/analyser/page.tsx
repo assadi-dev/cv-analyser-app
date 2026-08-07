@@ -12,6 +12,7 @@ import { cn, scoreColor } from "@/lib/utils"
 import { api } from "@/lib/api"
 import type { SSEEvent, SSEResultEvent, ChatMessage } from "@/types"
 import { Input } from "@/components/ui/input"
+import { ChatBot } from "./_components/ChatBot"
 
 const STEP_LABELS: Record<string, string> = {
   parsing: "Analyse des documents...",
@@ -77,9 +78,9 @@ export default function AnalyserPage() {
   const result = liveResult
 
   return (
-    <div className="flex h-full gap-5 p-8">
+    <div className="h-full flex gap-5 p-8 relative">
       {/* ── Left column — inputs ── */}
-      <div className="flex flex-col gap-4 w-[500px] shrink-0">
+      <div className="flex flex-col gap-4 w-[500px]">
 
         {/* CV Card */}
         <Card>
@@ -97,7 +98,7 @@ export default function AnalyserPage() {
         </Card>
 
         {/* Job Card */}
-        <Card>
+        <Card className="flex-1 flex flex-col gap-4 justify-between">
           <CardHeader
             icon={<Briefcase size={15} style={{ color: "#8B5CF6" }} />}
             title="Fiche de Poste"
@@ -106,41 +107,42 @@ export default function AnalyserPage() {
             placeholder="Collez la description du poste (missions, compétences requises, expérience)..."
             value={jobText}
             onChange={(e) => setJobText(e.target.value)}
-            className="min-h-[140px]"
+            className="flex-1"
           />
+          {/* Analyse button */}
+          <Button
+            size="lg"
+            className="w-full"
+            onClick={handleAnalyse}
+            loading={isStreaming}
+            disabled={!cvFile || !jobText.trim() || isStreaming}
+          >
+            <Zap size={20} />
+            {isStreaming ? (STEP_LABELS[sseState.currentStep ?? ""] ?? "Analyse en cours...") : "Analyser la compatibilité"}
+          </Button>
+
+          {/* Progress bar */}
+          {isStreaming && (
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between text-[11px]" style={{ color: "var(--color-text-subtle)" }}>
+                <span className="animate-pulse-soft">{STEP_LABELS[sseState.currentStep ?? ""] ?? "Initialisation..."}</span>
+                <span>{sseState.progress}%</span>
+              </div>
+              <div className="h-1.5 rounded-full w-full" style={{ background: "var(--color-border)" }}>
+                <div
+                  className="h-full rounded-full bg-gradient-primary transition-all duration-500"
+                  style={{ width: `${sseState.progress}%` }}
+                />
+              </div>
+            </div>
+          )}
         </Card>
 
-        {/* Analyse button */}
-        <Button
-          size="lg"
-          className="w-full"
-          onClick={handleAnalyse}
-          loading={isStreaming}
-          disabled={!cvFile || !jobText.trim()}
-        >
-          <Zap size={20} />
-          {isStreaming ? (STEP_LABELS[sseState.currentStep ?? ""] ?? "Analyse en cours...") : "Analyser la compatibilité"}
-        </Button>
 
-        {/* Progress bar */}
-        {isStreaming && (
-          <div className="flex flex-col gap-2">
-            <div className="flex justify-between text-[11px]" style={{ color: "var(--color-text-subtle)" }}>
-              <span className="animate-pulse-soft">{STEP_LABELS[sseState.currentStep ?? ""] ?? "Initialisation..."}</span>
-              <span>{sseState.progress}%</span>
-            </div>
-            <div className="h-1.5 rounded-full w-full" style={{ background: "var(--color-border)" }}>
-              <div
-                className="h-full rounded-full bg-gradient-primary transition-all duration-500"
-                style={{ width: `${sseState.progress}%` }}
-              />
-            </div>
-          </div>
-        )}
       </div>
 
       {/* ── Right column — results ── */}
-      <div className="flex flex-col gap-4 flex-1 min-w-0">
+      <div className="flex flex-col gap-4 flex-1 min-w-0 relative">
 
         {/* Scores */}
         <Card>
@@ -249,78 +251,7 @@ export default function AnalyserPage() {
         )}
 
         {/* Chat */}
-        <Card className="flex flex-col flex-1 min-h-[240px]">
-          <CardHeader
-            icon={<MessageCircle size={15} style={{ color: "var(--color-primary)" }} />}
-            title="Assistant IA"
-            action={
-              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold"
-                style={{ background: "var(--color-success-light)", color: "var(--color-success-text)" }}>
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)]" />
-                En ligne
-              </span>
-            }
-          />
 
-          {/* Messages */}
-          <div className="flex-1 flex flex-col gap-3 min-h-[120px] overflow-y-auto mb-3 p-3 rounded-[10px]"
-            style={{ background: "var(--color-surface-muted)" }}>
-            {chatMessages.length === 0 && (
-              <p className="text-[12px] text-center py-4" style={{ color: "var(--color-text-subtle)" }}>
-                {savedAnalyseId ? "Posez une question sur votre analyse..." : "Lancez d'abord une analyse."}
-              </p>
-            )}
-            {chatMessages.map((msg, i) => (
-              <div key={i} className={cn("flex gap-2.5 items-start", msg.role === "user" && "justify-end")}>
-                {msg.role === "assistant" && (
-                  <div className="w-7 h-7 rounded-full bg-gradient-primary shrink-0 flex items-center justify-center">
-                    <span className="text-white text-[9px] font-bold">AI</span>
-                  </div>
-                )}
-                <div className={cn("max-w-[80%] px-3 py-2 rounded-[10px] text-[12px] leading-relaxed",
-                  msg.role === "assistant"
-                    ? "bg-white border border-[var(--color-border)] text-[var(--color-text-secondary)]"
-                    : "bg-gradient-primary text-white"
-                )}>
-                  {msg.content}
-                </div>
-              </div>
-            ))}
-            {chatLoading && (
-              <div className="flex gap-2 items-center">
-                <div className="w-7 h-7 rounded-full bg-gradient-primary shrink-0 flex items-center justify-center">
-                  <span className="text-white text-[9px] font-bold">AI</span>
-                </div>
-                <div className="px-3 py-2 rounded-[10px] bg-white border border-[var(--color-border)]">
-                  <span className="animate-pulse-soft text-[12px]" style={{ color: "var(--color-text-subtle)" }}>...</span>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Chat input */}
-          <form onSubmit={handleChat} className="flex gap-2.5 items-center">
-            <input
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              placeholder={savedAnalyseId ? "Posez une question à l'assistant..." : "Lancez d'abord une analyse"}
-              disabled={!savedAnalyseId || chatLoading}
-              className="flex-1 h-[44px] px-3.5 rounded-[10px] text-[12px] outline-none border"
-              style={{
-                background: "var(--color-surface-muted)",
-                borderColor: "var(--color-border)",
-                color: "var(--color-text-secondary)",
-              }}
-            />
-            <button
-              type="submit"
-              disabled={!savedAnalyseId || !chatInput.trim() || chatLoading}
-              className="w-9 h-9 rounded-[8px] flex items-center justify-center bg-gradient-primary disabled:opacity-40 hover:opacity-90 transition-opacity"
-            >
-              <Send size={14} className="text-white" />
-            </button>
-          </form>
-        </Card>
       </div>
     </div>
   )
