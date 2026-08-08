@@ -1,9 +1,11 @@
 "use client"
 
 import { useAnalyse } from "../_hooks/useAnalyse"
+import { useChatPanel } from "../_hooks/useChatPanel"
 import { useCvUpload } from "../_hooks/useCvUpload"
 import { useJobDescription } from "../_hooks/useJobDescription"
 import { ChatBot } from "./ChatBot/ChatBot"
+import { ChatPanel, ChatPopover } from "./ChatBot/ChatPanel.tsx"
 import { CvUploadCard } from "./CvUploadCard"
 import { JobDescriptionCard } from "./JobDescriptionCard"
 import { RecommendationsCard } from "./RecommendationsCard/RecommendationsCard"
@@ -16,6 +18,7 @@ export function AnalyserClient() {
     cvFile,
     jobDescription,
   })
+  const { isOpen, toggle, close } = useChatPanel()
 
   return (
     <div className="relative flex flex-col lg:flex-row gap-5 p-4 sm:p-8 lg:h-full">
@@ -40,7 +43,7 @@ export function AnalyserClient() {
         <RecommendationsCard recommendations={result?.recommandations ?? []} />
       </div>
 
-      <ChatBot />
+      {isOpen ? <ChatPanel /> : <ChatBot isOpen={isOpen} toggle={toggle} close={close} />}
     </div>
   )
 }
