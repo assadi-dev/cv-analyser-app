@@ -1,56 +1,108 @@
 "use client"
 
-import { Bot, MessageCircle, Send, X } from "lucide-react"
-import { Button } from "@/components/ui/Button"
+import { useChat } from "@ai-sdk/react"
+import {
+  ArrowUpIcon,
+  GlobeIcon,
+  ImageIcon,
+  MessageCircleDashedIcon,
+  PaperclipIcon,
+  PlusIcon,
+  RotateCwIcon,
+  TelescopeIcon,
+} from "lucide-react"
+
+
+
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+} from "@/components/ui/input-group"
+import {
+  MessageScroller,
+  MessageScrollerButton,
+  MessageScrollerContent,
+  MessageScrollerProvider,
+  MessageScrollerViewport,
+} from "@/components/ui/message-scroller"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { Card, CardHeader } from "@/components/ui/Card"
-import { Input } from "@/components/ui/input"
-import { useAnalyseChat } from "../../_hooks/useAnalyseChat"
-import { useChatPanel } from "../../_hooks/useChatPanel"
-import { ChatMessageList } from "./ChatMessageList"
+import { Button } from "@/components/ui/Button"
+
+
+
 
 export function ChatBot() {
-  const { isOpen, toggle, close } = useChatPanel()
-  const { messages, input, setInput, send, isPending, isEnabled, canSend } = useAnalyseChat()
+  const { messages, sendMessage, status, setMessages } = useChat({
+    messages: [],
+
+  })
+
 
   return (
-    <div className="fixed lg:absolute bottom-6 right-6 z-20 flex flex-col items-end gap-3">
-      {isOpen && (
-        <Card className="w-[min(360px,calc(100vw-3rem))] flex flex-col gap-3">
-          <CardHeader
-            icon={<MessageCircle size={15} className="text-[var(--color-primary)]" />}
-            title="Assistant IA"
-            subtitle={isEnabled ? "À propos de votre analyse" : "Analyse requise"}
-            action={
-              <Button variant="ghost" size="sm" onClick={close} aria-label="Fermer la discussion">
-                <X size={14} />
-              </Button>
-            }
-            className="mb-0"
-          />
+    <MessageScrollerProvider>
+      <div className="relative flex flex-col gap-4">
+        <Card className="mx-auto h-140 w-full max-w-sm gap-0">
 
-          <ChatMessageList messages={messages} isPending={isPending} isEnabled={isEnabled} />
+          <div className="flex-1 overflow-hidden p-0">
+            {messages.length === 0 ? (
+              <Empty className="h-full">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <MessageCircleDashedIcon />
+                  </EmptyMedia>
+                  <EmptyTitle>Morning, shadcn!</EmptyTitle>
+                  <EmptyDescription>
+                    What are we working on today? Press send to start a new
+                    conversation
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            ) : (
+              <MessageScroller>
+                <MessageScrollerViewport>
 
-          <form onSubmit={send} className="flex gap-2">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Posez une question..."
-              disabled={!isEnabled}
-            />
-            <Button type="submit" disabled={!canSend} aria-label="Envoyer">
-              <Send size={16} />
-            </Button>
-          </form>
+                </MessageScrollerViewport>
+                <MessageScrollerButton />
+              </MessageScroller>
+            )}
+          </div>
+          <div className="flex-col gap-2">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+
+              }}
+              className="w-full"
+            >
+
+            </form>
+          </div>
         </Card>
-      )}
-
-      <Button
-        onClick={toggle}
-        className="w-12 h-12 p-0 rounded-full"
-        aria-label={isOpen ? "Fermer l'assistant" : "Ouvrir l'assistant"}
-      >
-        {isOpen ? <X size={20} /> : <Bot size={22} />}
-      </Button>
-    </div>
+        <div className="px-0.5 text-center text-xs text-muted-foreground">
+          Demo is read only. Press send to send messages.
+        </div>
+      </div>
+    </MessageScrollerProvider>
   )
 }
