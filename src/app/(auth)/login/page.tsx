@@ -14,11 +14,13 @@ import { cn } from "@/lib/utils"
 import { loginSchema, type LoginFormValues } from "@/lib/schemas"
 import { sendEncryptedCredentials } from "@/lib/security"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useRememberMeStore } from "@/store/rememberMe.store"
 
 export default function LoginPage() {
   const router = useRouter()
   const [showPwd, setShowPwd] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
+  const { rememberMe, setRememberMe } = useRememberMeStore()
 
   /**
    * nuqs — URL search params.
@@ -29,17 +31,20 @@ export default function LoginPage() {
   const [urlError] = useQueryState("error")
 
   const {
+    setValue,
+    watch,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "", rememberMe: false },
+    defaultValues: { email: "", password: "", rememberMe: rememberMe },
   })
+
+
 
   async function onSubmit(values: LoginFormValues) {
     setServerError(null)
-
     try {
       const result = await signIn.email({
         email: values.email.trim(),
@@ -48,10 +53,11 @@ export default function LoginPage() {
 
       })
 
+
       if (result.error) throw new Error(result.error.message)
 
-
-      router.push(redirectTo as any)
+      setRememberMe(values.rememberMe)
+      router.replace(redirectTo as any)
     } catch (err) {
       const msg = (err as Error).message ?? "Connexion échouée"
       setServerError(
@@ -63,6 +69,7 @@ export default function LoginPage() {
   }
 
   async function handleOAuth(provider: "google" | "linkedin") {
+    setRememberMe(watch("rememberMe"))
     await signIn.social({ provider, callbackURL: redirectTo })
   }
 
@@ -249,8 +256,8 @@ export default function LoginPage() {
             {/* Remember me */}
             <label className="flex items-center gap-2">
               <Checkbox
-                {...register("rememberMe")}
-
+                checked={watch("rememberMe")}
+                onCheckedChange={(checked) => setValue("rememberMe", Boolean(checked))}
 
               />
               <span className="text-sm text-gray-600">Se souvenir de moi</span>
