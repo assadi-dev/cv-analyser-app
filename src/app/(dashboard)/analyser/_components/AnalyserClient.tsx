@@ -43,7 +43,7 @@ export function AnalyserClient() {
         <RecommendationsCard recommendations={result?.recommandations ?? []} />
       </div>
 
-      {isOpen ? <ChatPanel /> : <ChatBot isOpen={isOpen} toggle={toggle} close={close} />}
+      {isOpen ? <ChatPanel result={result} recommendations={result?.recommandations ?? []} /> : <ChatBot isOpen={isOpen} toggle={toggle} close={close} />}
     </div>
   )
 }

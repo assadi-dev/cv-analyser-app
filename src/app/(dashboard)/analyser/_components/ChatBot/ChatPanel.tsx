@@ -31,20 +31,24 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupTextarea } fro
 import { motion } from "motion/react"
 import { Message, MessageContent } from "@/components/ui/message"
 import { Bubble, BubbleContent } from "@/components/ui/bubble"
-import { ChatMessageItem } from "../../_types"
+import { ChatMessageItem, AnalyseResult } from "../../_types"
 import { ChatMessageListMock } from "../../_mocks/chatMessageMock"
 import { useState } from "react"
 import { Marker, MarkerContent } from "@/components/ui/marker"
 import { PulsatingDots } from "@/components/loading-ui/pulsating-dots"
+import { Recommendation } from "@/types"
 
 
 
-
-export function ChatPanel() {
+interface ChatPanelProps {
+    result: AnalyseResult | null
+    recommendations: Recommendation[]
+}
+export function ChatPanel({ result }: ChatPanelProps) {
 
     const { isOpen, toggle, close } = useChatPanel()
     const { input, setInput, send, isPending, isEnabled, canSend } = useAnalyseChat()
-    const [messages, setMessage] = useState<ChatMessageItem[]>(ChatMessageListMock);
+    const [messages, setMessage] = useState<ChatMessageItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
 
@@ -72,7 +76,7 @@ export function ChatPanel() {
                 />
 
                 <CardContent className="w-[18vw] overflow-hidden py-3 relative  flex flex-col gap-4 flex-1" >
-                    <MessageList messages={messages} isLoading={isLoading} />
+                    {messages.length > 0 ? <MessageList messages={messages} isLoading={isLoading} /> : <EmptyMessage />}
                 </CardContent>
                 <CardFooter className="flex-col gap-2 border-0">
                     <form onSubmit={(e) => {
@@ -117,10 +121,9 @@ const EmptyMessage = () => (
             <EmptyMedia variant="icon">
                 <MessageCircleDashedIcon />
             </EmptyMedia>
-            <EmptyTitle>Morning, shadcn!</EmptyTitle>
+            <EmptyTitle>Aucune question</EmptyTitle>
             <EmptyDescription>
-                What are we working on today? Press send to start a new
-                conversation
+                Posez une question sur votre analyse et l'assistant IA vous répondra.
             </EmptyDescription>
         </EmptyHeader>
     </Empty>
