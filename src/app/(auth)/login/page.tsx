@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/Button"
 import { cn } from "@/lib/utils"
 import { loginSchema, type LoginFormValues } from "@/lib/schemas"
 import { sendEncryptedCredentials } from "@/lib/security"
+import { Checkbox } from "@/components/ui/checkbox"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -33,7 +34,7 @@ export default function LoginPage() {
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: "", password: "", rememberMe: false },
   })
 
   async function onSubmit(values: LoginFormValues) {
@@ -43,6 +44,7 @@ export default function LoginPage() {
       const result = await signIn.email({
         email: values.email.trim(),
         password: values.password,
+        rememberMe: values.rememberMe,
 
       })
 
@@ -243,6 +245,16 @@ export default function LoginPage() {
                 {displayError}
               </div>
             )}
+
+            {/* Remember me */}
+            <label className="flex items-center gap-2">
+              <Checkbox
+                {...register("rememberMe")}
+
+
+              />
+              <span className="text-sm text-gray-600">Se souvenir de moi</span>
+            </label>
 
             <Button type="submit" size="lg" loading={isSubmitting} className="w-full mt-1">
               <Zap size={18} /> Se connecter
