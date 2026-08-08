@@ -20,6 +20,7 @@
   },
   "registries": {
     "@kokonutui": "https://kokonutui.com/r/{name}.json",
-    "@diceui": "https://diceui.com/r/{style}/{name}.json"
+    "@diceui": "https://diceui.com/r/{style}/{name}.json",
+    "@loading-ui": "https://loading-ui.com/r/{name}.json"
   }
 }

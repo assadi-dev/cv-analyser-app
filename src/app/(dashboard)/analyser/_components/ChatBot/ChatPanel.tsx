@@ -23,16 +23,29 @@ import {
 import { Button } from "@/components/ui/Button"
 import { useChatPanel } from "../../_hooks/useChatPanel"
 import { useAnalyseChat } from "../../_hooks/useAnalyseChat"
-import { ArrowUpIcon, Bot, Maximize2, MessageCircle, MessageCircleDashedIcon, Minimize, Minimize2, X } from "lucide-react"
+import { ArrowUpIcon, Bot, Maximize2, MessageCircle, MessageCircleDashedIcon, Minimize, Minimize2, Send, X } from "lucide-react"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/Card"
-import { MessageScroller, MessageScrollerContent, MessageScrollerProvider, MessageScrollerViewport } from "@/components/ui/message-scroller"
+import { MessageScroller, MessageScrollerContent, MessageScrollerItem, MessageScrollerProvider, MessageScrollerViewport } from "@/components/ui/message-scroller"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupTextarea } from "@/components/ui/input-group"
+import { motion } from "motion/react"
+import { Message, MessageContent } from "@/components/ui/message"
+import { Bubble, BubbleContent } from "@/components/ui/bubble"
+import { ChatMessageItem } from "../../_types"
+import { ChatMessageListMock } from "../../_mocks/chatMessageMock"
+import { useState } from "react"
+import { Marker, MarkerContent } from "@/components/ui/marker"
+import { PulsatingDots } from "@/components/loading-ui/pulsating-dots"
+
+
+
 
 export function ChatPanel() {
 
     const { isOpen, toggle, close } = useChatPanel()
-    const { messages, input, setInput, send, isPending, isEnabled, canSend } = useAnalyseChat()
+    const { input, setInput, send, isPending, isEnabled, canSend } = useAnalyseChat()
+    const [messages, setMessage] = useState<ChatMessageItem[]>(ChatMessageListMock);
+    const [isLoading, setIsLoading] = useState(false);
 
 
     return (
@@ -49,7 +62,7 @@ export function ChatPanel() {
                                 <Maximize2 size={14} />
                             </button>
 
-                            <button type="button" className="pointer-cursor p-2 hover:bg-[var(--color-surface-muted)] transition-colors rounded-full" onClick={open} aria-label="Fermer la discussion">
+                            <button type="button" className="pointer-cursor p-2 hover:bg-[var(--color-surface-muted)] transition-colors rounded-full" onClick={close} aria-label="Fermer la discussion">
                                 <X size={14} />
                             </button>
 
@@ -58,23 +71,32 @@ export function ChatPanel() {
                     }
                 />
 
-                <CardContent className="w-[18vw] relative  flex flex-col gap-4" >
-                    <MessageList />
+                <CardContent className="w-[18vw] overflow-hidden py-3 relative  flex flex-col gap-4 flex-1" >
+                    <MessageList messages={messages} isLoading={isLoading} />
                 </CardContent>
                 <CardFooter className="flex-col gap-2 border-0">
                     <form onSubmit={(e) => {
                         e.preventDefault()
+                        const message: ChatMessageItem = {
+                            id: crypto.randomUUID(),
+                            content: e.currentTarget["input"].value,
+                            role: "user",
+                            timestamp: new Date().toISOString(),
+                        }
+                        setMessage((prev) => [...prev, message])
+                        setIsLoading(true);
+                        e.currentTarget.reset();
 
                     }}
                         className="w-full"  >
 
                         <InputGroup className="py-1.5">
 
-                            <InputGroupTextarea placeholder="Posez une question..." />
+                            <InputGroupTextarea name="input" placeholder="Posez une question..." />
                             <InputGroupAddon align="block-end" className="py-1.5" >
 
-                                <InputGroupButton type="submit" variant="primary" size="sm" className="ml-auto rounded-full p-1 size-8">
-                                    <ArrowUpIcon className="size-5" />
+                                <InputGroupButton type="submit" variant="primary" size="sm" className="ml-auto rounded-full p-1.5! size-6.5">
+                                    <Send className="size-5" />
                                     <span className="sr-only">Send Message</span>
                                 </InputGroupButton>
                             </InputGroupAddon>
@@ -104,18 +126,88 @@ const EmptyMessage = () => (
     </Empty>
 )
 
-export const MessageList = () => (
-    <MessageScroller>
-        {/* TODO: RENDER MESSAGES */}
-        <MessageScrollerViewport>
-            <MessageScrollerContent
-                aria-busy={false}
-                className="p-(--card-spacing)"
-            >
+type MessageListProps = {
+    messages: ChatMessageItem[]
+    isEnabled?: boolean
+    isLoading?: boolean
+}
+export const MessageList = ({ messages, isEnabled, isLoading }: MessageListProps) => {
 
+
+
+
+
+
+
+    return (<MessageScroller>
+        <MessageScrollerViewport className="px-1">
+            <MessageScrollerContent
+                aria-busy={isEnabled}
+                className="px-1"
+            >
+                {messages.map((message) => (
+                    <MotionMessageContent key={message.id} message={message} />
+                ))}
+
+                {isLoading && <Marker role="status">
+                    <MarkerContent className="shimmer">
+                        <PulsatingDots className="size-8" />
+
+                    </MarkerContent>
+                </Marker>}
 
             </MessageScrollerContent>
 
+
         </MessageScrollerViewport>
     </MessageScroller>
-)
+    )
+}
+
+
+
+
+const MotionMessageScrollerItem = motion.create(MessageScrollerItem)
+
+
+
+type MotionMessageContentProps = {
+    message: ChatMessageItem
+}
+const MotionMessageContent = ({ message }: MotionMessageContentProps) => {
+
+    const isUser = message.role === "user"
+
+    return (
+        <MotionMessageScrollerItem
+            animate={{ opacity: 1, transform: "translateY(0)" }}
+            initial={{ opacity: 0, transform: "translateY(20px)" }}
+            exit={{ opacity: 0, transform: "translateY(20px)" }}
+            transition={{ duration: 0.3 }}
+            messageId={message.id}
+            scrollAnchor={isUser}
+        >
+            <Message align={isUser ? "end" : "start"}>
+                {
+                    isUser ? (
+                        <MessageContent className="w-full">
+                            <Bubble variant={isUser ? "default" : "muted"}>
+                                <BubbleContent className="whitespace-pre-wrap" >{message.content}</BubbleContent>
+                            </Bubble>
+                        </MessageContent>
+                    ) : (
+
+                        <MessageContent className="w-full">
+                            <div className="w-full p-3 text-left"> {message.content}</div>
+                        </MessageContent>
+
+                    )
+                }
+
+
+            </Message>
+        </MotionMessageScrollerItem>
+    )
+}
+
+
