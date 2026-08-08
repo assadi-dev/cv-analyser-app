@@ -1,4 +1,7 @@
+"use client"
+
 import type { CandidatureSummary } from "@/types"
+import { useCandidaturesTable } from "../../_hooks/useCandidaturesTable"
 import { CandidaturesTableHeader } from "./CandidaturesTableHeader"
 import { CandidaturesTableRow } from "./CandidaturesTableRow"
 import { CandidaturesTableSkeleton } from "./CandidaturesTableSkeleton"
@@ -24,12 +27,14 @@ export function CandidaturesTable({
   onDelete,
   onView,
 }: CandidaturesTableProps) {
+  const table = useCandidaturesTable({ data: items, total, page, onPageChange, onDelete, onView })
+
   return (
     <div
       className="rounded-[14px] border overflow-hidden shadow-[var(--shadow-card)]"
       style={{ borderColor: "var(--color-border)", background: "white" }}
     >
-      <CandidaturesTableHeader />
+      <CandidaturesTableHeader headerGroups={table.getHeaderGroups()} />
 
       {isLoading ? (
         <CandidaturesTableSkeleton />
@@ -47,7 +52,7 @@ export function CandidaturesTable({
         ))
       )}
 
-      <CandidaturesPagination page={page} total={total} onPageChange={onPageChange} />
+      <CandidaturesPagination table={table} total={total} />
     </div>
   )
 }

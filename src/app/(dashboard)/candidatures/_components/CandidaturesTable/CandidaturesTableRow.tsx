@@ -11,12 +11,7 @@ interface CandidaturesTableRowProps {
   onView: (id: string) => void
 }
 
-export function CandidaturesTableRow({
-  item,
-  index,
-  onDelete,
-  onView,
-}: CandidaturesTableRowProps) {
+export function CandidaturesTableRow({ item, index, onDelete, onView }: CandidaturesTableRowProps) {
   return (
     <div
       className="grid h-16 px-5 items-center border-b hover:bg-[var(--color-surface-muted)] transition-colors"
@@ -26,7 +21,6 @@ export function CandidaturesTableRow({
         background: index % 2 === 1 ? "var(--color-surface-muted)" : "white",
       }}
     >
-      {/* Company */}
       <div className="flex items-center gap-2.5">
         <div
           className="w-[34px] h-[34px] rounded-[8px] flex items-center justify-center shrink-0 text-[14px] font-bold"
@@ -44,7 +38,6 @@ export function CandidaturesTableRow({
         </div>
       </div>
 
-      {/* Job */}
       <div className="min-w-0">
         <p className="text-[13px] font-medium truncate" style={{ color: "var(--color-text-secondary)" }}>
           {item.job_title}
@@ -54,19 +47,16 @@ export function CandidaturesTableRow({
         </p>
       </div>
 
-      {/* Score — no analyse yet */}
-      <span className="text-[12px]" style={{ color: "var(--color-text-subtle)" }}>—</span>
       <span className="text-[12px]" style={{ color: "var(--color-text-subtle)" }}>—</span>
 
-      {/* Date */}
+      <span className="text-[12px]" style={{ color: "var(--color-text-subtle)" }}>—</span>
+
       <span className="text-[12px]" style={{ color: "var(--color-text-muted)" }}>
         {formatDate(item.created_at)}
       </span>
 
-      {/* Status */}
       <StatusBadge status={item.status} />
 
-      {/* Actions */}
       <div className="flex items-center gap-2 justify-center">
         <button
           className="w-7 h-7 rounded-[6px] flex items-center justify-center hover:opacity-80 transition-opacity"

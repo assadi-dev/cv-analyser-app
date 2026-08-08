@@ -88,6 +88,22 @@
    * --------------------------------------------------------------------- */
   --spacing-sidebar: 220px;
   --spacing-topbar:  58px;
+
+  /* -----------------------------------------------------------------------
+   * Shadcn/ui compatibility variables
+   * --------------------------------------------------------------------- */
+  --color-background:             #FFFFFF;
+  --color-foreground:             #0F172A;
+  --color-muted:                  #F8FAFC;
+  --color-muted-foreground:       #64748B;
+  --color-popover:                #FFFFFF;
+  --color-popover-foreground:     #0F172A;
+  --color-input:                  #E2E8F0;
+  --color-ring:                   #7C3AED;
+  --color-accent:                 #F5F3FF;
+  --color-accent-foreground:      #6D28D9;
+  --color-destructive:            #EF4444;
+  --color-destructive-foreground: #FFFFFF;
 }
 
 /* -------------------------------------------------------------------------

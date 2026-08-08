@@ -201,3 +201,28 @@ export interface Profile {
   created_at: string
   updated_at: string
 }
+
+
+export interface CustomUserSession {
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    image: string | null | undefined;
+    api: {
+      token: string | null | undefined;
+      expires_at: string | null | undefined;
+    };
+    createdAt: Date;
+    updatedAt: Date;
+    emailVerified: boolean;
+  };
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  expiresAt: Date;
+  token: string;
+  ipAddress?: string | null | undefined;
+  userAgent?: string | null | undefined;
+} 

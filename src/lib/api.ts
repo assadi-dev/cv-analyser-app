@@ -120,8 +120,6 @@ export async function apiExternalFetch<T>(
   path: string,
   options: FetchOptions = {},
 ): Promise<T> {
-
-
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...options.headers,
@@ -161,6 +159,43 @@ export async function apiExternalFetch<T>(
   return res.json() as Promise<T>
 }
 
+export async function apiExternalFetchMultipart(
+  path: string,
+  body: FormData,
+  options: FetchOptions = {},
+): Promise<Response> {
+  const headers: Record<string, string> = {
+    ...options.headers,
+  }
+
+
+  const res = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers,
+    method: "POST",
+    body,
+  })
+
+  if (!res.ok) {
+    const errorData: ApiError = await res.json().catch(() => ({
+      error: { code: "UNKNOWN", message: res.statusText, context: {} },
+      request_id: "",
+    }))
+
+
+    throw new ApiRequestError(
+      res.status,
+      errorData.error.code,
+      errorData.error.message,
+      errorData.request_id,
+    )
+  }
+
+
+
+  return res
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Typed API helpers
 // ─────────────────────────────────────────────────────────────────────────────
@@ -177,8 +212,8 @@ export const api = {
   put: <T>(path: string, body: unknown) =>
     apiFetch<T>(path, { method: "PUT", body: JSON.stringify(body) }),
 
-  delete: <T>(path: string) =>
-    apiFetch<T>(path, { method: "DELETE" }),
+  delete: <T>(path: string, body?: unknown) =>
+    apiFetch<T>(path, { method: "DELETE", body: body ? JSON.stringify(body) : undefined }),
 
   upload: <T>(path: string, formData: FormData) =>
     apiFetch<T>(path, {
@@ -194,6 +229,8 @@ export const apiExternal = {
 
   post: <T>(path: string, body: unknown, options?: FetchOptions) =>
     apiExternalFetch<T>(path, { method: "POST", body: JSON.stringify(body), ...options }),
+  multipart: (path: string, body: FormData, options?: FetchOptions) =>
+    apiExternalFetchMultipart(path, body, options),
 
   patch: <T>(path: string, body: unknown, options?: FetchOptions) =>
     apiExternalFetch<T>(path, { method: "PATCH", body: JSON.stringify(body), ...options }),
