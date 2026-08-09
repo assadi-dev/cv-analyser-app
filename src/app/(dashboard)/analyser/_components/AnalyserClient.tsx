@@ -22,7 +22,7 @@ export function AnalyserClient() {
   const { isOpen, toggle, close } = useChatPanel()
 
   return (
-    <div className="relative flex flex-col lg:flex-row gap-5 p-4 sm:p-8 lg:h-full">
+    <div className="relative flex flex-col lg:flex-row  sm:p-8 lg:h-full">
       {/* ── Colonne gauche — saisie ── */}
       <div className="flex flex-col gap-4 w-full lg:w-[500px] lg:shrink-0">
         <CvUploadCard onSelect={selectCv} cvFile={cvFile} />
@@ -39,7 +39,7 @@ export function AnalyserClient() {
       </div>
 
       {/* ── Colonne droite — résultats ── */}
-      <div className="flex flex-col gap-4 flex-1 min-w-0">
+      <div className="flex flex-col gap-4  px-4 flex-1 min-w-0 overflow-y-auto">
         <ResultsCard result={result} />
         <RecommendationsCard recommendations={result?.recommandations ?? []} />
       </div>
