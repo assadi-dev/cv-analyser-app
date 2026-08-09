@@ -15,6 +15,8 @@ export const GET = async (req: NextRequest, { params }: { params: Promise<ChatHi
             headers: req.headers,
         })
         const options = await headersStructureFromSession(session)
+        //const res = await apiExternal.get(`/api/v1/analyses/${id}/`, options)
+
         return NextResponse.json({ conversation_id: id, title: `Title ${id}`, messages: [] });
     } catch (error) {
         return NextResponse.json({ error: "Failed to fetch chat history" }, { status: 500 });

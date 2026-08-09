@@ -15,6 +15,11 @@ export const useRetrieveAnalyses = ({ analyse_id }: { analyse_id: string | null 
         queryFn: async () => await fetchAnalyseDetails(analyse_id ?? ""),
         enabled: !!analyse_id
     })
+
+
+
+
+
     return { analyse, isLoading, error }
 
 }
