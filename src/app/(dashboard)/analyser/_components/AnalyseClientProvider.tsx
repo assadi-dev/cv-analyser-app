@@ -20,7 +20,8 @@ export const AnalyserClientProvider = ({ children, conversation_id, analyse_id }
 
 
     useEffect(() => {
-        if (!analyse || !analyse.id) return
+        if (!analyse || !analyse_id) return
+        console.log(analyse);
 
 
         const current_analyse: Analyse = {
@@ -43,18 +44,6 @@ export const AnalyserClientProvider = ({ children, conversation_id, analyse_id }
         } satisfies Analyse
 
         setAnalyse.setCurrentAnalyse(current_analyse)
-        const live_result = {
-            type: "result",
-            score_global: current_analyse.score_global,
-            score_ats: current_analyse.score_ats,
-            score_competences: current_analyse.score_competences,
-            score_experience: current_analyse.score_experience,
-            keywords_found: current_analyse.keywords_found,
-            keywords_missing: current_analyse.keywords_missing,
-            recommandations: current_analyse.recommandations,
-
-        } satisfies SSEResultEvent
-        setAnalyse.setLiveResult(live_result)
         setAnalyse.setSavedAnalyseId(analyse.id)
 
 
