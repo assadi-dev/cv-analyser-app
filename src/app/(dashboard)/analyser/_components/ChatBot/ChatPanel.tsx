@@ -10,6 +10,7 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupTextarea } fro
 import { motion } from "motion/react"
 import { Message, MessageContent } from "@/components/ui/message"
 import { Bubble, BubbleContent } from "@/components/ui/bubble"
+import MarkdownContent from "@/components/ui/MarkdownContent"
 import { ChatMessageItem, AnalyseResult } from "../../_types"
 import { Marker, MarkerContent } from "@/components/ui/marker"
 import { PulsatingDots } from "@/components/loading-ui/pulsating-dots"
@@ -175,7 +176,9 @@ const MotionMessageContent = ({ message }: MotionMessageContentProps) => {
                     ) : (
 
                         <MessageContent className="w-full">
-                            <div className="w-full p-3 text-left"> {message.content}</div>
+                            <div className="w-full p-3 text-left">
+                                <MarkdownContent content={message.content} />
+                            </div>
                         </MessageContent>
 
                     )
