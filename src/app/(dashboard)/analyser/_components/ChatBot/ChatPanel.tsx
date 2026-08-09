@@ -37,6 +37,7 @@ import { useState } from "react"
 import { Marker, MarkerContent } from "@/components/ui/marker"
 import { PulsatingDots } from "@/components/loading-ui/pulsating-dots"
 import { Recommendation } from "@/types"
+import { useChatMessage } from "../../_hooks/useChatMessage"
 
 
 
@@ -48,8 +49,7 @@ export function ChatPanel({ result }: ChatPanelProps) {
 
     const { isOpen, toggle, close } = useChatPanel()
     const { input, setInput, send, isPending, isEnabled, canSend } = useAnalyseChat()
-    const [messages, setMessage] = useState<ChatMessageItem[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const chatMessage = useChatMessage()
 
 
     return (

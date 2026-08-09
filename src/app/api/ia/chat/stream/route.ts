@@ -3,7 +3,7 @@ import { headersStructureFromSession } from "@/lib/apiCall"
 import { auth } from "@/lib/auth"
 import { NextRequest, NextResponse } from "next/server"
 
-const POST = async (req: NextRequest) => {
+export const POST = async (req: NextRequest) => {
     const { question, conversationID } = await req.json()
 
     const session = await auth.api.getSession({

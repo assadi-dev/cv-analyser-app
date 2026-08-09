@@ -110,7 +110,7 @@ export interface ChatMessage {
 
 export interface Analyse {
   id: string
-  candidature_id: string
+  candidature_id?: string
   cv_id: string | null
   score_global: number
   score_ats: number
@@ -147,6 +147,7 @@ export interface SSEResultEvent {
   keywords_found: string[]
   keywords_missing: string[]
   recommandations: Recommendation[]
+  analyse_id?: string
 }
 
 export interface SSEErrorEvent {
@@ -160,7 +161,22 @@ export interface SSEDoneEvent {
   analyse_id: string
 }
 
-export type SSEEvent = SSEProgressEvent | SSEResultEvent | SSEErrorEvent | SSEDoneEvent
+export interface ChatMessageSSEStepEvent {
+  type: "start" | "token" | "complete" | "error"
+  conversation_id: string
+  message: string | null
+  error?: string
+  data?: {
+    id: string
+    chunk: string | null
+    content: string
+    role: ChatMessage['role']
+    timestamp: string
+  }
+  complete?: boolean
+}
+
+export type SSEEvent = SSEProgressEvent | SSEResultEvent | SSEErrorEvent | SSEDoneEvent | ChatMessageSSEStepEvent
 
 // ─── API responses ───────────────────────────────────────────────────────────
 
