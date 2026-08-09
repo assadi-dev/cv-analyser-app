@@ -59,13 +59,19 @@ export const useChatMessage = () => {
             timestamp: new Date().toISOString(),
         })
 
-        /*  if (!savedAnalyseId) throw new Error("Analyse ID is required")
-  
-          start(CHAT_STREAM_ENDPOINT, {
-              conversation_id,
-              question,
-              analyse_id: savedAnalyseId,
-          })*/
+        if (!conversation_id && !savedAnalyseId) throw new Error("Analyse ID is required")
+
+        start(CHAT_STREAM_ENDPOINT, {
+            // Omitted rather than sent as "": the API schema treats
+            // conversation_id as an optional uuid, not an optional string —
+            // an empty string fails validation instead of being ignored.
+            ...(conversation_id ? { conversation_id } : {}),
+            question,
+            // Once a conversation exists, its snapshot already carries the
+            // analysis context — resending analyse_id would just point back
+            // at the same one.
+            ...(!conversation_id ? { analyse_id: savedAnalyseId! } : {}),
+        })
     }
 
 

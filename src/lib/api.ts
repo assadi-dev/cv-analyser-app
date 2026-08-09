@@ -196,6 +196,47 @@ export async function apiExternalFetchMultipart(
   return res
 }
 
+/**
+ * POSTs a JSON body and returns the raw Response, without reading it.
+ *
+ * apiExternalFetch cannot be used for streaming endpoints: it ends with
+ * res.json(), which buffers the whole body and defeats the point of SSE.
+ */
+export async function apiExternalFetchStream(
+  path: string,
+  body: unknown,
+  options: FetchOptions = {},
+): Promise<Response> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Accept: "text/event-stream",
+    ...options.headers,
+  }
+
+  const res = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers,
+    method: "POST",
+    body: JSON.stringify(body),
+  })
+
+  if (!res.ok) {
+    const errorData: ApiError = await res.json().catch(() => ({
+      error: { code: "UNKNOWN", message: res.statusText, context: {} },
+      request_id: "",
+    }))
+
+    throw new ApiRequestError(
+      res.status,
+      errorData.error.code,
+      errorData.error.message,
+      errorData.request_id,
+    )
+  }
+
+  return res
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Typed API helpers
 // ─────────────────────────────────────────────────────────────────────────────
@@ -231,6 +272,10 @@ export const apiExternal = {
     apiExternalFetch<T>(path, { method: "POST", body: JSON.stringify(body), ...options }),
   multipart: (path: string, body: FormData, options?: FetchOptions) =>
     apiExternalFetchMultipart(path, body, options),
+
+  // Returns the raw Response so the caller can pipe a stream through.
+  postStream: (path: string, body: unknown, options?: FetchOptions) =>
+    apiExternalFetchStream(path, body, options),
 
   patch: <T>(path: string, body: unknown, options?: FetchOptions) =>
     apiExternalFetch<T>(path, { method: "PATCH", body: JSON.stringify(body), ...options }),

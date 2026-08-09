@@ -16,7 +16,7 @@ export type ChatMessageSSEEvent = {
 
 interface ChatMessagesStore {
 
-    conversation_id: string,
+    conversation_id: string | null,
     messages: ChatMessageItem[]
     setConversationId: (id: string) => void,
     addMessage: (message: ChatMessageItem) => void
@@ -25,7 +25,10 @@ interface ChatMessagesStore {
 }
 
 export const useMessagesStore = create<ChatMessagesStore>((set) => ({
-    conversation_id: "",
+    // null, not "": an empty string is still a truthy-looking value that gets
+    // serialized and sent as conversation_id on the first message, which the
+    // API schema rejects (uuid().optional() allows a missing key, not "").
+    conversation_id: null,
     messages: [],
     setConversationId: (conversation_id: string) => set((state) => ({ ...state, conversation_id: conversation_id })),
     addMessage: (message) => set((state) => { return { ...state, messages: [...state.messages, message] } }),

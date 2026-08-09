@@ -83,9 +83,6 @@ export function useChatSSE(onEvent?: (event: ChatMessageSSEStepEvent) => void) {
         try {
             const res = await fetch(apiUrl, {
                 method: "POST",
-                // Without this header fetch sends text/plain and the API
-                // rejects the body with a 422.
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body),
                 signal: controller.signal,
             })
