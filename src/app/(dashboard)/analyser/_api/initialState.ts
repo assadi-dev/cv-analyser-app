@@ -1,4 +1,5 @@
-import { AnalyseDetailsApiResponse } from "../_types/api";
+import { ChatMessageItem } from "../_types";
+import { AnalyseDetailsApiResponse, ChatHistoryApiResponse, MessageApiResponse } from "../_types/api";
 
 
 export const defaultAnalyseApiResponse: AnalyseDetailsApiResponse = {
@@ -20,3 +21,19 @@ export const defaultAnalyseApiResponse: AnalyseDetailsApiResponse = {
 
 }
 
+
+export const defaultChatHistoryApiResponse: ChatHistoryApiResponse = {
+    conversation_id: null,
+    title: null,
+    messages: []
+}
+
+
+export const messagesMapperFromApiResponse = (messages: MessageApiResponse[]): ChatMessageItem[] => {
+    return messages.map((message: MessageApiResponse) => ({
+        id: message.id,
+        role: message.role as "user" | "assistant",
+        content: message.content,
+        timestamp: message.created_at,
+    }))
+}
