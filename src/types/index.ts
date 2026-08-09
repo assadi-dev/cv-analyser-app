@@ -111,7 +111,8 @@ export interface ChatMessage {
 export interface Analyse {
   id: string
   candidature_id?: string
-  cv_id: string | null
+  cv_id?: string | null
+  job_description?: string | null
   score_global: number
   score_ats: number
   score_competences: number
@@ -123,7 +124,7 @@ export interface Analyse {
   ai_provider: string
   ai_model: string
   created_at: string
-  updated_at: string
+  updated_at?: string
 }
 
 // ─── SSE Events ──────────────────────────────────────────────────────────────

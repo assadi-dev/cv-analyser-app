@@ -1,11 +1,7 @@
+import { Recommendation } from "@/types";
 
 
-export type RecommendationItemType = {
-    title: string;
-    type: string;
-    description: string;
-    impact: string;
-}
+export type RecommendationItemType = Recommendation
 
 export type AnalyseDetailsApiResponse = {
     id: string;
@@ -18,4 +14,10 @@ export type AnalyseDetailsApiResponse = {
     score_experience: number;
     score_global: number;
     recommandations: RecommendationItemType[];
+    ai_model: string
+    ai_provider: string
+    cv_id: string | null;
+    created_at: string
+    updated_at: string
+
 }

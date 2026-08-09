@@ -1,5 +1,7 @@
 import { api } from "@/lib/api"
 import { ANALYSE_CHAT_HISTORY_ENDPOINT, ANALYSE_DETAILS_ENDPOINT } from "./analyse.api"
+import { promises } from "dns"
+import { AnalyseDetailsApiResponse } from "../_types/api"
 
 
 
@@ -14,10 +16,10 @@ export const fetchChatHistory = async (conversationId?: string | null) => {
     return response
 }
 
-export const fetchAnalyseDetails = async (analyseId?: string | null) => {
+export const fetchAnalyseDetails = async (analyseId?: string | null): Promise<AnalyseDetailsApiResponse> => {
     if (!analyseId) {
-        return null
+        throw new Error("Analyse ID is required")
     }
-    const response = await api.get(`${ANALYSE_DETAILS_ENDPOINT}/${analyseId}`)
+    const response = await api.get<AnalyseDetailsApiResponse>(`${ANALYSE_DETAILS_ENDPOINT}/${analyseId}`)
     return response
 }
