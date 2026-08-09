@@ -1,25 +1,4 @@
-import {
-    Popover,
-    PopoverContent,
-    PopoverDescription,
-    PopoverHeader,
-    PopoverTitle,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuPortal,
-    DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+
 import { Button } from "@/components/ui/Button"
 import { useChatPanel } from "../../_hooks/useChatPanel"
 import { useAnalyseChat } from "../../_hooks/useAnalyseChat"
@@ -32,8 +11,6 @@ import { motion } from "motion/react"
 import { Message, MessageContent } from "@/components/ui/message"
 import { Bubble, BubbleContent } from "@/components/ui/bubble"
 import { ChatMessageItem, AnalyseResult } from "../../_types"
-import { ChatMessageListMock } from "../../_mocks/chatMessageMock"
-import { useState } from "react"
 import { Marker, MarkerContent } from "@/components/ui/marker"
 import { PulsatingDots } from "@/components/loading-ui/pulsating-dots"
 import { Recommendation } from "@/types"
@@ -48,8 +25,10 @@ interface ChatPanelProps {
 export function ChatPanel({ result }: ChatPanelProps) {
 
     const { isOpen, toggle, close } = useChatPanel()
-    const { input, setInput, send, isPending, isEnabled, canSend } = useAnalyseChat()
-    const chatMessage = useChatMessage()
+    const { isPending: isAnalysePending, isEnabled } = useAnalyseChat()
+    const { sendMessage, messages, isPending: isChatPending } = useChatMessage()
+
+    const isLoading = isAnalysePending || isChatPending
 
 
     return (
@@ -81,14 +60,9 @@ export function ChatPanel({ result }: ChatPanelProps) {
                 <CardFooter className="flex-col gap-2 border-0">
                     <form onSubmit={(e) => {
                         e.preventDefault()
-                        const message: ChatMessageItem = {
-                            id: crypto.randomUUID(),
-                            content: e.currentTarget["input"].value,
-                            role: "user",
-                            timestamp: new Date().toISOString(),
-                        }
-                        setMessage((prev) => [...prev, message])
-                        setIsLoading(true);
+                        const questions = e.currentTarget["input"].value;
+                        if (!questions) return;
+                        sendMessage(questions)
                         e.currentTarget.reset();
 
                     }}

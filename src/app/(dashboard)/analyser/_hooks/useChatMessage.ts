@@ -3,13 +3,13 @@
 import { useAnalyseStore } from "@/store/analyse.store"
 import { useEffect, useState, useTransition } from "react"
 import { ChatMessageItem } from "../_types"
-import { CHAT_STREAM_ENDPOINT } from "../_api/chat-message.api"
-import { useSSE } from "@/hooks/useSSE"
 import { useToast } from "@/hooks/useToast"
 import { ChatMessageSSEStepEvent, SSEEvent, SSEResultEvent } from "@/types"
 import { logError } from "@/lib/logger"
 import { useMessagesStore } from "@/store/useMessagesStore"
 import { useChatSSE } from "@/hooks/useChatSSE"
+
+export const CHAT_STREAM_ENDPOINT = "/api/ia/chat/stream"
 
 
 export const useChatMessage = () => {
@@ -30,10 +30,10 @@ export const useChatMessage = () => {
         } else if (event.type === "complete") {
             setIsPending(false)
             const message: ChatMessageItem = {
-                id: crypto.randomUUID(),
-                role: "assistant",
-                content: String(event.data.content),
-                timestamp: event.data.timestamp!,
+                id: event.data?.id ?? crypto.randomUUID(),
+                role: event.data?.role ?? "assistant",
+                content: String(event.data?.content),
+                timestamp: event.data?.timestamp ?? new Date().toISOString(),
             }
             addMessage(message)
         } else if (event.type === "error") {
@@ -50,12 +50,31 @@ export const useChatMessage = () => {
     const savedAnalyseId = useAnalyseStore((s) => s.savedAnalyseId)
 
 
+    const sendMessage = (question: string) => {
+
+        addMessage({
+            role: "user",
+            content: question,
+            id: crypto.randomUUID(),
+            timestamp: new Date().toISOString(),
+        })
+
+        /*  if (!savedAnalyseId) throw new Error("Analyse ID is required")
+  
+          start(CHAT_STREAM_ENDPOINT, {
+              conversation_id,
+              question,
+              analyse_id: savedAnalyseId,
+          })*/
+    }
 
 
 
 
 
-    return { messages, isPending }
+
+
+    return { messages, isPending, sendMessage }
 
 
 }
