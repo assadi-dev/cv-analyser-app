@@ -20,7 +20,7 @@ export const AnalyserClientProvider = ({ children, conversation_id, analyse_id }
 
 
     useEffect(() => {
-        if (!analyse) return
+        if (!analyse || !analyse.id) return
 
 
         const current_analyse: Analyse = {
