@@ -2,6 +2,7 @@
 import { headersStructureFromSession } from "@/lib/apiCall"
 import { auth } from "@/lib/auth"
 import { NextRequest, NextResponse } from "next/server"
+import { chatStreamDecoder } from "../schema"
 
 export const POST = async (req: NextRequest) => {
     const { question, conversationID } = await req.json()
@@ -10,20 +11,17 @@ export const POST = async (req: NextRequest) => {
         headers: req.headers,
     })
     const options = await headersStructureFromSession(session)
-    const body = await req.formData();
+    const body = chatStreamDecoder.temporary_chat_stream_input(await req.json())
 
 
 
-    if (!question) {
-        return NextResponse.json({ error: "Question is required" }, { status: 400 })
-    }
-
-    if (!conversationID) {
-        return NextResponse.json({ error: "Conversation ID is required" }, { status: 400 })
+    if (!body.success) {
+        throw body.error
     }
 
 
 
-    const data = "hello"
+
+    const data = body.data
     return NextResponse.json(data)
 }
