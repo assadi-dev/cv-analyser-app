@@ -21,3 +21,19 @@ export type AnalyseDetailsApiResponse = {
     updated_at: string
 
 }
+
+
+export interface MessageApiResponse {
+    id: string;
+    conversation_id: string;
+    content: string;
+    role: string;
+    created_at: string;
+}
+
+export interface ChatHistoryApiResponse {
+    conversation_id: string | null;
+    title: string | null;
+    messages: MessageApiResponse[];
+}
+

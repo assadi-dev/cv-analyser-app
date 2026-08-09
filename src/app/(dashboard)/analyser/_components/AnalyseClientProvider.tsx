@@ -13,7 +13,7 @@ interface AnalyserClientProviderProps {
 }
 
 export const AnalyserClientProvider = ({ children, conversation_id, analyse_id }: AnalyserClientProviderProps) => {
-    // useChatHistory({ conversation_id: conversation_id || null })
+    useChatHistory({ conversation_id: conversation_id || null })
     const { analyse, isLoading } = useRetrieveAnalyses({ analyse_id: analyse_id || null })
     const setAnalyse = useAnalyseStore()
 
@@ -21,11 +21,8 @@ export const AnalyserClientProvider = ({ children, conversation_id, analyse_id }
 
     useEffect(() => {
         if (!analyse || !analyse_id) return
-        console.log(analyse);
-
-
         const current_analyse: Analyse = {
-            ...analyse,
+
             id: analyse.id,
             job_description: analyse.job_description,
             score_global: analyse.score_global,
@@ -49,6 +46,12 @@ export const AnalyserClientProvider = ({ children, conversation_id, analyse_id }
 
 
     }, [analyse, isLoading])
+
+    useEffect(() => {
+        if (!conversation_id) return
+        //set conversation id to the store
+
+    }, [conversation_id])
 
 
 

@@ -1,18 +1,22 @@
 import { api } from "@/lib/api"
 import { ANALYSE_CHAT_HISTORY_ENDPOINT, ANALYSE_DETAILS_ENDPOINT } from "./analyse.api"
 import { promises } from "dns"
-import { AnalyseDetailsApiResponse } from "../_types/api"
+import { AnalyseDetailsApiResponse, ChatHistoryApiResponse } from "../_types/api"
 
 
 
 
 
 
-export const fetchChatHistory = async (conversationId?: string | null) => {
+export const fetchChatHistory = async (conversationId?: string | null): Promise<ChatHistoryApiResponse> => {
     if (!conversationId) {
-        return { data: [] }
+        return {
+            conversation_id: null,
+            title: null,
+            messages: []
+        }
     }
-    const response = await api.get(`${ANALYSE_CHAT_HISTORY_ENDPOINT}/${conversationId}`)
+    const response = await api.get<ChatHistoryApiResponse>(`${ANALYSE_CHAT_HISTORY_ENDPOINT}/${conversationId}`)
     return response
 }
 
