@@ -68,7 +68,7 @@ export function useAnalyse({ cvFile, jobDescription }: UseAnalyseParams) {
     score_experience: liveResult?.score_experience ?? currentAnalyse?.score_experience ?? 0,
     keywords_found: liveResult?.keywords_found ?? currentAnalyse?.keywords_found ?? [],
     keywords_missing: liveResult?.keywords_missing ?? currentAnalyse?.keywords_missing ?? [],
-    recommandations: currentAnalyse?.recommandations ?? [],
+    recommandations: liveResult?.recommandations ?? currentAnalyse?.recommandations ?? [],
     analyse_id: liveResult?.analyse_id ?? currentAnalyse?.id ?? null,
 
 
