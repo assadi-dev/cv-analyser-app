@@ -88,6 +88,42 @@ describe("BoardView", () => {
     )
   })
 
+  it("gives each column its own surface", () => {
+    /**
+     * Dice UI's column ships `bg-zinc-100 dark:bg-zinc-900` and a bare
+     * `border`. tailwind-merge drops the light background in favour of ours,
+     * but only because the palette class is actually there — lose it and the
+     * five columns silently fall back to the same zinc.
+     */
+    const { container } = render(<BoardView columns={MOCK_BOARD} />)
+    const surfaces = Array.from(
+      container.querySelectorAll('[data-slot="kanban-column"]')
+    ).map(
+      (column) =>
+        Array.from(column.classList).find((name) =>
+          name.startsWith("bg-kanban-")
+        ) ?? null
+    )
+
+    expect(surfaces).toHaveLength(5)
+    expect(surfaces).not.toContain(null)
+    expect(new Set(surfaces).size).toBe(5)
+  })
+
+  it("neutralises the border colour the component leaves at currentColor", () => {
+    /**
+     * `border` alone is a width: Tailwind v4's preflight resets borders to
+     * `0 solid`, so the colour falls through to `currentColor` — a near-black
+     * outline around every column, which the design never had.
+     */
+    const { container } = render(<BoardView columns={MOCK_BOARD} />)
+    for (const column of container.querySelectorAll(
+      '[data-slot="kanban-column"]'
+    )) {
+      expect(column.classList).toContain("border-transparent")
+    }
+  })
+
   it("re-syncs when the server sends a new board", () => {
     const { rerender } = render(<BoardView columns={MOCK_BOARD} />)
     expect(screen.getByText("Datameid")).toBeInTheDocument()

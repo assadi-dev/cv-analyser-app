@@ -9,6 +9,13 @@ import type { CandidatureStatus } from "@/types"
  *
  * Classes are written in full because Tailwind scans source text: a
  * constructed name like `bg-${color}-50` is never emitted.
+ *
+ * The surfaces come from the `--color-kanban-*` tokens of globals.css, the
+ * palette the project already declared for this board. `border-transparent`
+ * is deliberate: Dice UI's column ships a bare `border`, which in Tailwind v4
+ * means 1px of `currentColor` — a near-black outline around every column. It
+ * only sets the width, so declaring the colour here neutralises it without
+ * touching the component.
  */
 export interface BoardColumnConfig {
   status: CandidatureStatus
@@ -23,7 +30,7 @@ export const BOARD_COLUMNS: BoardColumnConfig[] = [
   {
     status: "to_send",
     label: "À envoyer",
-    surface: "bg-slate-100/70",
+    surface: "border-transparent bg-kanban-to-send",
     dot: "bg-slate-500",
     text: "text-slate-700",
     badge: "bg-slate-200 text-slate-700",
@@ -31,7 +38,7 @@ export const BOARD_COLUMNS: BoardColumnConfig[] = [
   {
     status: "sent",
     label: "Envoyée",
-    surface: "bg-blue-50",
+    surface: "border-transparent bg-kanban-sent",
     dot: "bg-blue-500",
     text: "text-blue-700",
     badge: "bg-blue-200 text-blue-800",
@@ -39,7 +46,7 @@ export const BOARD_COLUMNS: BoardColumnConfig[] = [
   {
     status: "interview",
     label: "Entretien",
-    surface: "bg-violet-50",
+    surface: "border-transparent bg-kanban-interview",
     dot: "bg-violet-500",
     text: "text-violet-700",
     badge: "bg-violet-200 text-violet-800",
@@ -47,7 +54,7 @@ export const BOARD_COLUMNS: BoardColumnConfig[] = [
   {
     status: "rejected",
     label: "Refusée",
-    surface: "bg-red-50",
+    surface: "border-transparent bg-kanban-rejected",
     dot: "bg-red-500",
     text: "text-red-700",
     badge: "bg-red-200 text-red-800",
@@ -55,7 +62,7 @@ export const BOARD_COLUMNS: BoardColumnConfig[] = [
   {
     status: "accepted",
     label: "Acceptée",
-    surface: "bg-emerald-50",
+    surface: "border-transparent bg-kanban-accepted",
     dot: "bg-emerald-500",
     text: "text-emerald-700",
     badge: "bg-emerald-200 text-emerald-800",
