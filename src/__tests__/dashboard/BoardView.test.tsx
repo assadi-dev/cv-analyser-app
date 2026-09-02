@@ -110,6 +110,24 @@ describe("BoardView", () => {
     expect(new Set(surfaces).size).toBe(5)
   })
 
+  it("leaves no dark background for the column to fall back on", () => {
+    /**
+     * The colours have to survive the `dark` variant compiling either way.
+     * globals.css binds it to a class nobody sets, but that is a stylesheet
+     * fix — and a stale build cache has already been caught serving an older
+     * compilation of it. Declaring our own `dark:` background makes
+     * tailwind-merge strip `dark:bg-zinc-900` from the markup, which no build
+     * cache can undo.
+     */
+    const { container } = render(<BoardView columns={MOCK_BOARD} />)
+    for (const column of container.querySelectorAll(
+      '[data-slot="kanban-column"]'
+    )) {
+      expect(column.className).not.toMatch(/dark:bg-zinc/)
+      expect(column.className).toMatch(/dark:bg-kanban-/)
+    }
+  })
+
   it("neutralises the border colour the component leaves at currentColor", () => {
     /**
      * `border` alone is a width: Tailwind v4's preflight resets borders to
