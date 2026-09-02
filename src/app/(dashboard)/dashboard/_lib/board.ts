@@ -110,3 +110,30 @@ export function moveCard(
 
   return next
 }
+
+/**
+ * Re-stamps every card with the status of the column it now sits in.
+ *
+ * Dice UI moves the card object from one column to the next without touching
+ * its fields, so a dropped card still carries its previous status. The board
+ * itself does not care — it renders by column — but everything reading
+ * `card.status` does: the dashboard counters would keep the old tally until
+ * the next refetch, and the card would flicker back on any consumer that
+ * groups by status.
+ *
+ * Applied when writing the optimistic board into the cache, so what the cache
+ * holds matches what the server is about to store.
+ */
+export function syncCardStatuses(columns: KanbanColumns): KanbanColumns {
+  const synced: KanbanColumns = {}
+
+  for (const [status, cards] of Object.entries(columns)) {
+    synced[status] = cards.map((card) =>
+      card.status === status
+        ? card
+        : { ...card, status: status as CandidatureStatus }
+    )
+  }
+
+  return synced
+}

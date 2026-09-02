@@ -117,6 +117,16 @@ export interface CandidatureMoveResponse {
   position: number
 }
 
+/**
+ * The board as `GET /api/kanban` delivers it — grouped and ordered server-side.
+ *
+ * Every column is always present, even empty: a column that vanished with its
+ * last card would leave nowhere to drop one back into.
+ */
+export interface KanbanBoardResponse {
+  columns: Record<CandidatureStatus, CandidatureSummary[]>
+}
+
 // ─── Analyse ─────────────────────────────────────────────────────────────────
 
 export type RecommendationType = "warning" | "success" | "info"

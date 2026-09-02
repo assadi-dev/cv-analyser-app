@@ -20,7 +20,16 @@ import BoardCardGhost from "./BoardCardGhost"
 
 interface BoardViewProps {
   columns: KanbanColumns
-  onMove?: (cardId: string, payload: CandidatureMovePayload) => void
+  /**
+   * Reports a drop. `board` is the settled state the user is looking at —
+   * handed over so the caller can persist it as-is instead of rebuilding the
+   * same ordering from the payload.
+   */
+  onMove?: (
+    cardId: string,
+    payload: CandidatureMovePayload,
+    board: KanbanColumns
+  ) => void
   onOpenCard?: (id: string) => void
 }
 
@@ -60,7 +69,7 @@ export default function BoardView({
     if (!hasCardMoved(beforeDragRef.current, board, droppedCardId)) return
 
     const payload = resolveMovePayload(board, droppedCardId)
-    if (payload) onMove?.(droppedCardId, payload)
+    if (payload) onMove?.(droppedCardId, payload, board)
   }, [droppedCardId, board, onMove])
 
   const handleDragStart = useCallback(() => {

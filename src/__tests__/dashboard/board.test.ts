@@ -4,6 +4,7 @@ import {
   resolveMovePayload,
   hasCardMoved,
   moveCard,
+  syncCardStatuses,
   type KanbanColumns,
 } from "@/app/(dashboard)/dashboard/_lib/board"
 import {
@@ -224,5 +225,54 @@ describe("drop → payload round trip", () => {
       before_id: null,
       after_id: null,
     })
+  })
+})
+
+// ─── syncCardStatuses ────────────────────────────────────────────────────────
+
+describe("syncCardStatuses", () => {
+  it("stamps a moved card with the status of its new column", () => {
+    // moveCard already re-stamps, so start from a board where the card was
+    // relocated without touching its fields — exactly what Dice UI produces.
+    const moved = {
+      ...MOCK_BOARD,
+      to_send: MOCK_BOARD.to_send.filter((c) => c.id !== A),
+      interview: [
+        ...MOCK_BOARD.interview,
+        MOCK_BOARD.to_send.find((c) => c.id === A)!,
+      ],
+    }
+    expect(locateCard(moved, A)).toEqual({ status: "interview", index: 1 })
+    expect(moved.interview[1].status).toBe("to_send")
+
+    const synced = syncCardStatuses(moved)
+    expect(synced.interview[1].status).toBe("interview")
+  })
+
+  it("leaves a board that already agrees with itself untouched", () => {
+    const synced = syncCardStatuses(MOCK_BOARD)
+    for (const status of Object.keys(MOCK_BOARD)) {
+      expect(ids(synced, status)).toEqual(ids(MOCK_BOARD, status))
+      synced[status].forEach((card, index) => {
+        // Same object, not a copy: nothing to update means nothing to
+        // re-render downstream.
+        expect(card).toBe(MOCK_BOARD[status][index])
+      })
+    }
+  })
+
+  it("does not mutate the board it is given", () => {
+    const moved = {
+      ...EMPTY_BOARD,
+      accepted: [MOCK_BOARD.to_send[0]],
+    }
+    syncCardStatuses(moved)
+    expect(moved.accepted[0].status).toBe("to_send")
+  })
+
+  it("keeps every column, including the empty ones", () => {
+    expect(Object.keys(syncCardStatuses(EMPTY_BOARD))).toEqual(
+      Object.keys(EMPTY_BOARD)
+    )
   })
 })
