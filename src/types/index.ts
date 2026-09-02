@@ -91,6 +91,42 @@ export interface CandidatureSummary {
   updated_at: string
 }
 
+// ─── Kanban ──────────────────────────────────────────────────────────────────
+
+/**
+ * Payload of a board move.
+ *
+ * Positions are never sent: the board reports the cards framing the drop
+ * point and the API resolves their live ranks. That way a stale cache cannot
+ * write a wrong order, and the client never has to track positions at all.
+ *
+ * `after_id` is the primary anchor — the card takes its place and pushes it
+ * down. `before_id` only matters when dropping at the end of a column. Both
+ * null means an empty column.
+ */
+export interface CandidatureMovePayload {
+  status: CandidatureStatus
+  before_id: string | null
+  after_id: string | null
+}
+
+/** Placement the API actually applied, used to reconcile without a refetch. */
+export interface CandidatureMoveResponse {
+  message: string
+  status: CandidatureStatus
+  position: number
+}
+
+/**
+ * The board as `GET /api/kanban` delivers it — grouped and ordered server-side.
+ *
+ * Every column is always present, even empty: a column that vanished with its
+ * last card would leave nowhere to drop one back into.
+ */
+export interface KanbanBoardResponse {
+  columns: Record<CandidatureStatus, CandidatureSummary[]>
+}
+
 // ─── Analyse ─────────────────────────────────────────────────────────────────
 
 export type RecommendationType = "warning" | "success" | "info"
@@ -110,8 +146,9 @@ export interface ChatMessage {
 
 export interface Analyse {
   id: string
-  candidature_id: string
-  cv_id: string | null
+  candidature_id?: string
+  cv_id?: string | null
+  job_description?: string | null
   score_global: number
   score_ats: number
   score_competences: number
@@ -123,7 +160,7 @@ export interface Analyse {
   ai_provider: string
   ai_model: string
   created_at: string
-  updated_at: string
+  updated_at?: string
 }
 
 // ─── SSE Events ──────────────────────────────────────────────────────────────
@@ -147,6 +184,7 @@ export interface SSEResultEvent {
   keywords_found: string[]
   keywords_missing: string[]
   recommandations: Recommendation[]
+  analyse_id?: string
 }
 
 export interface SSEErrorEvent {
@@ -160,7 +198,22 @@ export interface SSEDoneEvent {
   analyse_id: string
 }
 
-export type SSEEvent = SSEProgressEvent | SSEResultEvent | SSEErrorEvent | SSEDoneEvent
+export interface ChatMessageSSEStepEvent {
+  type: "start" | "token" | "complete" | "error"
+  conversation_id: string
+  message: string | null
+  error?: string
+  data?: {
+    id: string
+    chunk: string | null
+    content: string
+    role: ChatMessage['role']
+    timestamp: string
+  }
+  complete?: boolean
+}
+
+export type SSEEvent = SSEProgressEvent | SSEResultEvent | SSEErrorEvent | SSEDoneEvent | ChatMessageSSEStepEvent
 
 // ─── API responses ───────────────────────────────────────────────────────────
 

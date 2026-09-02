@@ -1,9 +1,12 @@
 "use client"
 
 import { useAnalyse } from "../_hooks/useAnalyse"
+import { useChatPanel } from "../_hooks/useChatPanel"
 import { useCvUpload } from "../_hooks/useCvUpload"
 import { useJobDescription } from "../_hooks/useJobDescription"
 import { ChatBot } from "./ChatBot/ChatBot"
+import { ChatPanel } from "./ChatBot/ChatPanel"
+
 import { CvUploadCard } from "./CvUploadCard"
 import { JobDescriptionCard } from "./JobDescriptionCard"
 import { RecommendationsCard } from "./RecommendationsCard/RecommendationsCard"
@@ -16,9 +19,10 @@ export function AnalyserClient() {
     cvFile,
     jobDescription,
   })
+  const { isOpen, toggle, close } = useChatPanel()
 
   return (
-    <div className="relative flex flex-col lg:flex-row gap-5 p-4 sm:p-8 lg:h-full">
+    <div className="relative flex flex-col lg:flex-row  sm:p-8 lg:h-full">
       {/* ── Colonne gauche — saisie ── */}
       <div className="flex flex-col gap-4 w-full lg:w-[500px] lg:shrink-0">
         <CvUploadCard onSelect={selectCv} cvFile={cvFile} />
@@ -35,12 +39,12 @@ export function AnalyserClient() {
       </div>
 
       {/* ── Colonne droite — résultats ── */}
-      <div className="flex flex-col gap-4 flex-1 min-w-0">
+      <div className="flex flex-col gap-4  px-4 flex-1 min-w-0 overflow-y-auto">
         <ResultsCard result={result} />
         <RecommendationsCard recommendations={result?.recommandations ?? []} />
       </div>
 
-      <ChatBot />
+      {isOpen ? <ChatPanel result={result} recommendations={result?.recommandations ?? []} /> : <ChatBot isOpen={isOpen} toggle={toggle} close={close} />}
     </div>
   )
 }

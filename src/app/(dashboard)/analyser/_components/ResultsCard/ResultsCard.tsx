@@ -29,7 +29,7 @@ export function ResultsCard({ result }: ResultsCardProps) {
         title="Résultats de l'analyse"
       />
 
-      {result ? (
+      {result && result.analyse_id ? (
         <>
           <GlobalScoreSummary result={result} />
           <ScoreBreakdown items={toScoreItems(result)} />

@@ -1,5 +1,24 @@
 @import "tailwindcss";
 
+/* -------------------------------------------------------------------------
+ * Dark variant — déclenché par une classe, jamais par le système
+ *
+ * Convention shadcn v4, absente jusqu'ici. Sans cette ligne, `dark:` retombe
+ * sur le défaut Tailwind, `@media (prefers-color-scheme: dark)` : les 19
+ * classes `dark:` des composants vendorisés (kanban, bubble, input-group,
+ * Button…) s'activent dès que l'OS est en thème sombre, alors que
+ * l'application n'a aucune palette sombre — `body` est peint en clair en dur.
+ *
+ * Le symptôme visible était le board : `KanbanColumn` embarque
+ * `dark:bg-zinc-900`, qui repeignait les cinq colonnes du même gris et
+ * effaçait leurs couleurs. Neutraliser la variante ici corrige les 19 d'un
+ * coup, sans toucher aux composants d'origine.
+ *
+ * `.dark` n'est posée nulle part : la variante ne matche donc jamais. Le jour
+ * où un thème sombre arrivera, il suffira de poser la classe sur `<html>`.
+ * ----------------------------------------------------------------------- */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* -----------------------------------------------------------------------
    * Brand colors

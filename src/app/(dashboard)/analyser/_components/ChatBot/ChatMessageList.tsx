@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import MarkdownContent from "@/components/ui/MarkdownContent"
 import type { ChatMessage } from "@/types"
 
 interface ChatMessageListProps {
@@ -30,7 +31,11 @@ export function ChatMessageList({ messages, isPending, isEnabled }: ChatMessageL
               : "self-start bg-[var(--color-surface-muted)] text-[var(--color-text-secondary)]",
           )}
         >
-          {message.content}
+          {message.role === "assistant" ? (
+            <MarkdownContent content={message.content} />
+          ) : (
+            message.content
+          )}
         </div>
       ))}
 

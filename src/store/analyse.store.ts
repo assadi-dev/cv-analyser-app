@@ -21,12 +21,12 @@ interface AnalyseStore {
 }
 
 export const useAnalyseStore = create<AnalyseStore>((set) => ({
-  liveResult:     null,
+  liveResult: null,
   savedAnalyseId: null,
   currentAnalyse: null,
 
-  setLiveResult:    (result)  => set({ liveResult: result }),
-  setSavedAnalyseId:(id)      => set({ savedAnalyseId: id }),
-  setCurrentAnalyse:(analyse) => set({ currentAnalyse: analyse }),
+  setLiveResult: (result) => set({ liveResult: result }),
+  setSavedAnalyseId: (id) => set({ savedAnalyseId: id }),
+  setCurrentAnalyse: (analyse) => set({ currentAnalyse: analyse }),
   reset: () => set({ liveResult: null, savedAnalyseId: null, currentAnalyse: null }),
 }))

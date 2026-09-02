@@ -1,18 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useChatPanelStore } from "@/store/chatPanel.store"
 
 /** Gère l'ouverture du panneau de discussion flottant. */
 export function useChatPanel() {
-  const [isOpen, setIsOpen] = useState(false)
+  const { isOpen, toggle, close, open, isMaximized, toggleMaximized } = useChatPanelStore()
 
-  function toggle() {
-    setIsOpen((prev) => !prev)
-  }
 
-  function close() {
-    setIsOpen(false)
-  }
-
-  return { isOpen, toggle, close }
+  return { isOpen, toggle, close, open, isMaximized, toggleMaximized }
 }

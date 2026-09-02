@@ -1,6 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "default",
+  "style": "new-york-v4",
   "rsc": true,
   "tsx": true,
   "tailwind": {
@@ -19,6 +19,8 @@
     "hooks": "@/hooks"
   },
   "registries": {
-    "@kokonutui": "https://kokonutui.com/r/{name}.json"
+    "@kokonutui": "https://kokonutui.com/r/{name}.json",
+    "@diceui": "https://diceui.com/r/{style}/{name}.json",
+    "@loading-ui": "https://loading-ui.com/r/{name}.json"
   }
 }
