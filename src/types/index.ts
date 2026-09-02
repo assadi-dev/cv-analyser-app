@@ -91,6 +91,32 @@ export interface CandidatureSummary {
   updated_at: string
 }
 
+// ─── Kanban ──────────────────────────────────────────────────────────────────
+
+/**
+ * Payload of a board move.
+ *
+ * Positions are never sent: the board reports the cards framing the drop
+ * point and the API resolves their live ranks. That way a stale cache cannot
+ * write a wrong order, and the client never has to track positions at all.
+ *
+ * `after_id` is the primary anchor — the card takes its place and pushes it
+ * down. `before_id` only matters when dropping at the end of a column. Both
+ * null means an empty column.
+ */
+export interface CandidatureMovePayload {
+  status: CandidatureStatus
+  before_id: string | null
+  after_id: string | null
+}
+
+/** Placement the API actually applied, used to reconcile without a refetch. */
+export interface CandidatureMoveResponse {
+  message: string
+  status: CandidatureStatus
+  position: number
+}
+
 // ─── Analyse ─────────────────────────────────────────────────────────────────
 
 export type RecommendationType = "warning" | "success" | "info"
