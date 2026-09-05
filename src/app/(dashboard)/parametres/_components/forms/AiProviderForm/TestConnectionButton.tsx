@@ -3,6 +3,8 @@
 import { useFormContext } from "react-hook-form"
 import { Zap } from "lucide-react"
 import { Button } from "@/components/ui/Button"
+import { getAIProvider } from "../../../_lib/ai-providers.config"
+import type { AIProvider } from "@/types"
 import type { AiProviderTestResult } from "../../../_api/ai-provider.api"
 import type { AiProviderFormValues } from "../../../_lib/ai-provider.schema"
 
@@ -10,6 +12,14 @@ interface TestConnectionButtonProps {
   onTest: () => void
   isPending: boolean
   result: AiProviderTestResult | undefined
+}
+
+function describeResult(result: AiProviderTestResult): string {
+  if (!result.success) return result.message
+
+  const providerLabel = getAIProvider(result.provider as AIProvider).label
+  const latency = result.latency_ms != null ? ` — ${result.latency_ms} ms` : ""
+  return `Connecté à ${result.model} (${providerLabel})${latency}`
 }
 
 export function TestConnectionButton({ onTest, isPending, result }: TestConnectionButtonProps) {
@@ -24,7 +34,7 @@ export function TestConnectionButton({ onTest, isPending, result }: TestConnecti
         </Button>
         {result && (
           <span className="text-[12px]" style={{ color: result.success ? "var(--color-success-text)" : "var(--color-danger-text)" }}>
-            {result.message}
+            {describeResult(result)}
           </span>
         )}
       </div>
