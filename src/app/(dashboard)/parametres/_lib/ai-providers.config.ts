@@ -16,7 +16,7 @@ export const AI_PROVIDERS: AIProviderConfig[] = [
   { id: "groq", label: "Groq", models: ["llama-3.1-70b-versatile", "mixtral-8x7b-32768"], color: "#F97316" },
   { id: "mistral", label: "Mistral", models: ["mistral-large-latest", "mistral-small-latest"], color: "#FF7000" },
   { id: "openrouter", label: "OpenRouter", models: ["openai/gpt-4o", "anthropic/claude-3.5-sonnet"], color: "#6366F1" },
-  { id: "ollama", label: "Ollama", models: ["llama3.2", "mistral", "codellama"], color: "#1E293B", local: true, defaultBaseUrl: "http://localhost:11434" },
+  { id: "ollama", label: "Ollama", models: ["llama3.2:latest", "llama3.2:1b", "mistral:7b", "mistral-small3.2:latest", "mistral-large-3:675b-cloud", "gemma4:latest", "gemma4:e4b", "gemma4:cloud", "deepseek-r1:latest", "glm-5.3:cloud", "kimi-k3:cloud", "codellama:latest"], color: "#1E293B", local: true, defaultBaseUrl: "http://localhost:11434" },
 ]
 
 export function getAIProvider(id: AIProvider): AIProviderConfig {
