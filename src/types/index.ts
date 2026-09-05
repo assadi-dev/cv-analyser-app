@@ -14,6 +14,9 @@ export interface User {
   auth_provider: string
   ai_provider: AIProvider
   ai_model: string
+  /** Encrypted at rest — never plaintext. Treat as an opaque "a key is set" flag, never display or resend as-is. */
+  ai_api_key: string | null
+  ai_base_url: string | null
   preferred_language: "fr" | "en"
   ats_threshold: number
   recommendation_detail: "concise" | "detailed"
