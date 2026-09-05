@@ -2,6 +2,7 @@
 
 import { useFormContext, useWatch } from "react-hook-form"
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
+import { Combobox } from "@/components/ui/combobox"
 import { getAIProvider } from "../../../_lib/ai-providers.config"
 import type { AiProviderFormValues } from "../../../_lib/ai-provider.schema"
 
@@ -20,13 +21,14 @@ export function ModelSelectField() {
             Modèle par défaut
           </FormLabel>
           <FormControl>
-            <select
-              {...field}
-              className="h-10 px-3 rounded-[8px] text-[13px] border outline-none w-full"
-              style={{ background: "var(--color-surface-muted)", borderColor: "var(--color-border)", color: "var(--color-text-secondary)" }}
-            >
-              {models.map((m) => <option key={m} value={m}>{m}</option>)}
-            </select>
+            <Combobox
+              value={field.value}
+              onChange={field.onChange}
+              options={models}
+              placeholder="Sélectionner un modèle"
+              searchPlaceholder="Rechercher ou saisir un modèle..."
+              emptyText="Aucun modèle correspondant — vous pouvez saisir le vôtre."
+            />
           </FormControl>
           <FormMessage className="text-[11px]" />
         </FormItem>
