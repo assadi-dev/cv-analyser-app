@@ -18,3 +18,20 @@ export const syncProfile = async (encryptedData: EncryptedData): Promise<AuthenA
 
     }
 }
+
+/**
+ * Asks FastAPI to erase everything it holds for the token's user: profile,
+ * preferences, CVs (files included), analyses, chat conversations,
+ * candidatures, contacts and Kanban board.
+ *
+ * Unlike `syncProfile` this throws on failure — the caller has to know the data
+ * is still there, since removing the better-auth account would then leave it
+ * orphaned with nobody able to reach it.
+ */
+export const removeApiAccount = async (token: string): Promise<void> => {
+    await apiExternal.post(
+        "/api/v1/account/remove",
+        { confirm: true },
+        { headers: { Authorization: `Bearer ${token}` } },
+    )
+}
