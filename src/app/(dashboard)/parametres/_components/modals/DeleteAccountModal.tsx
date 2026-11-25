@@ -53,7 +53,7 @@ export function DeleteAccountModal({ isOpen, onClose, onConfirm, isPending }: De
             Cette action est irréversible
           </p>
           <p className="text-[12px]" style={{ color: "#F87171" }}>
-            Toutes vos données seront supprimées définitivement : profil, CV, analyses, candidatures et préférences.
+            Toutes vos données seront supprimées définitivement : compte et sessions, CV (fichiers compris), analyses, conversations avec l&apos;assistant, candidatures, contacts, tableau Kanban et préférences.
           </p>
         </div>
         <div className="flex flex-col gap-1.5">
