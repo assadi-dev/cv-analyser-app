@@ -13,9 +13,11 @@ interface CvUploadCardProps {
   cvFile: File | null
   /** The CV stored on the candidature the page was opened from, if any. */
   linkedCv?: { id: string; name: string | undefined }
+  /** The server could not read the linked CV's text. */
+  isLinkedCvUnreadable?: boolean
 }
 
-export function CvUploadCard({ onSelect, cvFile, linkedCv }: CvUploadCardProps) {
+export function CvUploadCard({ onSelect, cvFile, linkedCv, isLinkedCvUnreadable = false }: CvUploadCardProps) {
   return (
     <Card>
       <CardHeader
@@ -24,7 +26,13 @@ export function CvUploadCard({ onSelect, cvFile, linkedCv }: CvUploadCardProps) 
         action={<Badge variant="purple">PDF</Badge>}
       />
 
-      {linkedCv && <LinkedCvNotice name={linkedCv.name} isReplaced={cvFile !== null} />}
+      {linkedCv && (
+        <LinkedCvNotice
+          name={linkedCv.name}
+          // A chosen file settles it, whatever happened to the linked CV.
+          state={cvFile !== null ? "replaced" : isLinkedCvUnreadable ? "unreadable" : "used"}
+        />
+      )}
 
       <InputFileUpload cvFile={cvFile} onSelect={onSelect} />
 

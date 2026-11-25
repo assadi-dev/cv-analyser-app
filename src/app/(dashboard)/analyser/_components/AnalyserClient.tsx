@@ -39,7 +39,15 @@ export function AnalyserClient({ candidatureId }: AnalyserClientProps) {
     hasPrefilled.current = true
     setJobDescription(candidatureJobDescription)
   }, [candidatureJobDescription, setJobDescription])
-  const { result, isStreaming, canAnalyse, progress, currentStep, analyse } = useAnalyse({
+  const {
+    result,
+    isStreaming,
+    canAnalyse,
+    isLinkedCvUnreadable,
+    progress,
+    currentStep,
+    analyse,
+  } = useAnalyse({
     cvFile,
     jobDescription,
     // Only an id the API confirmed is sent: a wrong one would fail the whole
@@ -62,7 +70,12 @@ export function AnalyserClient({ candidatureId }: AnalyserClientProps) {
           />
         )}
 
-        <CvUploadCard onSelect={selectCv} cvFile={cvFile} linkedCv={linkedCv} />
+        <CvUploadCard
+          onSelect={selectCv}
+          cvFile={cvFile}
+          linkedCv={linkedCv}
+          isLinkedCvUnreadable={isLinkedCvUnreadable}
+        />
 
         <JobDescriptionCard
           value={jobDescription}

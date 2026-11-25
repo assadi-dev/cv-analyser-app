@@ -2,7 +2,7 @@ import { headersStructureFromSession } from "@/lib/apiCall";
 import { auth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { analyseStreamDecoder } from "./schema";
-import { apiExternal } from "@/lib/api";
+import { ApiRequestError, apiExternal } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +42,12 @@ export const POST = async (req: NextRequest) => {
         })
     } catch (error) {
         console.error(error)
+        // The API's own answer (a CV it cannot read, a candidature that is not
+        // the user's...) goes through with its status and code: the client
+        // tells the user what is wrong from them, not a blanket "failed".
+        if (error instanceof ApiRequestError) {
+            return NextResponse.json({ error: error.message, code: error.code }, { status: error.status });
+        }
         return NextResponse.json({ error: "Failed to fetch analysis" }, { status: 500 });
     }
 }

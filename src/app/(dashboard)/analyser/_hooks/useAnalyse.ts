@@ -1,11 +1,13 @@
 "use client"
 
+import { useRef, useState } from "react"
 import { useSSE } from "@/hooks/useSSE"
 import { useToast } from "@/hooks/useToast"
 import { logError } from "@/lib/logger"
 import { useAnalyseStore } from "@/store/analyse.store"
 import type { SSEEvent, SSEResultEvent } from "@/types"
 import { ANALYSE_STREAM_ENDPOINT } from "../_api/analyse.api"
+import { CV_TEXT_UNREADABLE, describeAnalyseError } from "../_lib/analyse-errors"
 import type { AnalyseResult } from "../_types"
 import { string } from "zod"
 
@@ -33,6 +35,12 @@ export function useAnalyse({ cvFile, jobDescription, candidatureId, linkedCvId }
   const setSavedAnalyseId = useAnalyseStore((s) => s.setSavedAnalyseId)
   const resetAnalyseStore = useAnalyseStore((s) => s.reset)
 
+  // The stored CV the last request went out with — `undefined` when a file was
+  // sent. Tells an error about "the linked CV" from one about "this PDF".
+  const sentStoredCvRef = useRef<string | undefined>(undefined)
+  // A linked CV the server could not read: it is not worth sending again.
+  const [unreadableCvId, setUnreadableCvId] = useState<string | null>(null)
+
   function handleEvent(event: SSEEvent) {
     if (event.type === "result") {
       setLiveResult(event as SSEResultEvent)
@@ -40,15 +48,29 @@ export function useAnalyse({ cvFile, jobDescription, candidatureId, linkedCvId }
       setSavedAnalyseId(event.analyse_id)
       if (candidatureId) toast.success("Analyse rattachée à la candidature")
     } else if (event.type === "error") {
-      logError(event.message, "useAnalyse")
-      toast.error("L'analyse a échoué", event.message ?? "Erreur lors de l'analyse")
+      const code = "error_code" in event ? event.error_code : undefined
+      // An unreadable CV is something the user fixes, already explained below:
+      // logging it as an error would only raise a false alarm in development.
+      if (code !== CV_TEXT_UNREADABLE) logError(event.message, "useAnalyse")
+      const usedStoredCv = sentStoredCvRef.current !== undefined
+      const { title, description } = describeAnalyseError(
+        code,
+        event.message ?? "Erreur lors de l'analyse",
+        { usedStoredCv }
+      )
+      toast.error(title, description)
+      if (code === CV_TEXT_UNREADABLE && sentStoredCvRef.current) {
+        setUnreadableCvId(sentStoredCvRef.current)
+      }
     }
   }
 
   const { state, start, reset: resetStream } = useSSE(handleEvent)
 
   const isStreaming = state.status === "streaming" || state.status === "connecting"
-  const hasCv = cvFile !== null || Boolean(linkedCvId)
+  const isLinkedCvUnreadable = Boolean(linkedCvId) && linkedCvId === unreadableCvId
+  // An unreadable linked CV only counts again once the user brings a file.
+  const hasCv = cvFile !== null || (Boolean(linkedCvId) && !isLinkedCvUnreadable)
   const canAnalyse = hasCv && jobDescription.trim().length > 0 && !isStreaming
 
   async function analyse() {
@@ -56,6 +78,7 @@ export function useAnalyse({ cvFile, jobDescription, candidatureId, linkedCvId }
 
     resetAnalyseStore()
     resetStream()
+    sentStoredCvRef.current = cvFile ? undefined : linkedCvId
 
     try {
       await start(ANALYSE_STREAM_ENDPOINT, {
@@ -91,6 +114,8 @@ export function useAnalyse({ cvFile, jobDescription, candidatureId, linkedCvId }
     result: finalResult,
     isStreaming,
     canAnalyse,
+    /** The CV linked to the candidature could not be read: a file is needed. */
+    isLinkedCvUnreadable,
     progress: state.progress,
     currentStep: state.currentStep,
     error: state.error,

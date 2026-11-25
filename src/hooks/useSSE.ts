@@ -24,6 +24,24 @@ const INITIAL_STATE: SSEState = {
   analyseId: null,
 }
 
+/** The server refused the request before any stream started. */
+class SSEHttpError extends Error {
+  constructor(
+    public readonly status: number,
+    public readonly code: string,
+    message: string
+  ) {
+    super(message)
+    this.name = "SSEHttpError"
+  }
+}
+
+/** Reads the `{ error, code }` body the proxy routes answer with. */
+async function readHttpError(res: Response): Promise<SSEHttpError> {
+  const body = (await res.json().catch(() => null)) as { error?: string; code?: string } | null
+  return new SSEHttpError(res.status, body?.code ?? `HTTP_${res.status}`, body?.error ?? `HTTP ${res.status}`)
+}
+
 /**
  * Hook for consuming SSE streams from the analysis endpoint.
  *
@@ -69,7 +87,7 @@ export function useSSE(onEvent?: (event: SSEEvent) => void) {
       })
 
       if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`)
+        throw await readHttpError(res)
       }
 
       setState((s) => ({ ...s, status: "streaming" }))
@@ -128,11 +146,19 @@ export function useSSE(onEvent?: (event: SSEEvent) => void) {
       setState((s) => (s.status === "streaming" ? { ...s, status: "done" } : s))
     } catch (err) {
       if ((err as Error).name === "AbortError") return
+      const message = (err as Error).message ?? "Streaming error"
       setState((s) => ({
         ...s,
         status: "error",
-        error: (err as Error).message ?? "Streaming error",
+        error: message,
       }))
+      // Reported like an error the stream itself sends: a refused request used
+      // to set `state.error`, which nothing displays, so it failed silently.
+      onEvent?.({
+        type: "error",
+        message,
+        error_code: err instanceof SSEHttpError ? err.code : "STREAM_ERROR",
+      })
     }
   }
 
