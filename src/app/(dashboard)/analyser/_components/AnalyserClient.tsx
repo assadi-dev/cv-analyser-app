@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { useAnalyse } from "../_hooks/useAnalyse"
 import { useAnalyseStore } from "@/store/analyse.store"
 import { AddCandidatureModal } from "@/app/(dashboard)/candidatures/_components/modals/AddCandidatureModal"
@@ -9,6 +9,7 @@ import { useAnalyseCandidature } from "../_hooks/useAnalyseCandidature"
 import { useChatPanel } from "../_hooks/useChatPanel"
 import { useCvUpload } from "../_hooks/useCvUpload"
 import { useJobDescription } from "../_hooks/useJobDescription"
+import { useStoredCvSelection } from "../_hooks/useStoredCvSelection"
 import { ChatBot } from "./ChatBot/ChatBot"
 import { ChatPanel } from "./ChatBot/ChatPanel"
 
@@ -34,6 +35,16 @@ export function AnalyserClient({ candidatureId }: AnalyserClientProps) {
     isLoading: isCandidatureLoading,
     isError: isCandidatureError,
   } = useAnalyseCandidature(candidatureId)
+  const { cvs: storedCvs, selectedCvId, selectStoredCv } = useStoredCvSelection(linkedCv?.id)
+
+  // A stored CV and an uploaded file exclude each other: picking one drops the other.
+  const handleSelectStoredCv = useCallback(
+    (id: string) => {
+      selectStoredCv(id)
+      selectCv(null)
+    },
+    [selectStoredCv, selectCv]
+  )
 
   // Pre-fill once, when the offer arrives: a later refetch must not overwrite
   // what the user has edited since.
@@ -57,16 +68,18 @@ export function AnalyserClient({ candidatureId }: AnalyserClientProps) {
     // Only an id the API confirmed is sent: a wrong one would fail the whole
     // analysis with a 404 instead of just leaving it unattached.
     candidatureId: candidature?.id,
-    linkedCvId: linkedCv?.id,
+    // The stored CV picked in the select, which starts as the candidature's own.
+    linkedCvId: selectedCvId,
   })
   const { isOpen, toggle, close } = useChatPanel()
 
-  // The CV the analysis ran on: the one linked to the candidature, or the one
-  // saved with an analysis that was reopened.
+  // The CV the analysis ran on: the stored one picked (or linked to the
+  // candidature), or the one saved with an analysis that was reopened. An
+  // uploaded file has no stored id to carry over.
   const analysedCvId = useAnalyseStore((s) => s.currentAnalyse?.cv_id)
   const addToCandidatures = useAddToCandidatures({
     jobDescription,
-    cvId: linkedCv?.id ?? analysedCvId,
+    cvId: (cvFile ? undefined : selectedCvId) ?? analysedCvId,
   })
 
   return (
@@ -87,6 +100,9 @@ export function AnalyserClient({ candidatureId }: AnalyserClientProps) {
           cvFile={cvFile}
           linkedCv={linkedCv}
           isLinkedCvUnreadable={isLinkedCvUnreadable}
+          storedCvs={storedCvs}
+          selectedCvId={selectedCvId}
+          onSelectStoredCv={handleSelectStoredCv}
         />
 
         <JobDescriptionCard

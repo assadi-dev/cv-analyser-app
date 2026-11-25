@@ -4,8 +4,10 @@ import { FileIcon, FileText, Upload, UploadCloud, X } from "lucide-react"
 import { Badge } from "@/components/ui/Badge"
 import { Card, CardHeader } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
+import type { CVSummary } from "@/types"
 import { LinkedCvNotice } from "./LinkedCvNotice"
+import { StoredCvSelect } from "./StoredCvSelect"
 
 
 interface CvUploadCardProps {
@@ -15,9 +17,25 @@ interface CvUploadCardProps {
   linkedCv?: { id: string; name: string | undefined }
   /** The server could not read the linked CV's text. */
   isLinkedCvUnreadable?: boolean
+  /** The user's stored CVs. The select is hidden when there are none. */
+  storedCvs?: CVSummary[]
+  /** The stored CV the analysis will run on, when no file is chosen. */
+  selectedCvId?: string
+  onSelectStoredCv?: (id: string) => void
 }
 
-export function CvUploadCard({ onSelect, cvFile, linkedCv, isLinkedCvUnreadable = false }: CvUploadCardProps) {
+export function CvUploadCard({
+  onSelect,
+  cvFile,
+  linkedCv,
+  isLinkedCvUnreadable = false,
+  storedCvs = [],
+  selectedCvId,
+  onSelectStoredCv,
+}: CvUploadCardProps) {
+  // A chosen file settles it: the select then shows no selection.
+  const showLinkedNotice = linkedCv && (cvFile !== null || selectedCvId === linkedCv.id)
+
   return (
     <Card>
       <CardHeader
@@ -26,7 +44,15 @@ export function CvUploadCard({ onSelect, cvFile, linkedCv, isLinkedCvUnreadable 
         action={<Badge variant="purple">PDF</Badge>}
       />
 
-      {linkedCv && (
+      {storedCvs.length > 0 && onSelectStoredCv && (
+        <StoredCvSelect
+          cvs={storedCvs}
+          value={cvFile ? undefined : selectedCvId}
+          onChange={onSelectStoredCv}
+        />
+      )}
+
+      {showLinkedNotice && (
         <LinkedCvNotice
           name={linkedCv.name}
           // A chosen file settles it, whatever happened to the linked CV.
@@ -43,12 +69,14 @@ export function CvUploadCard({ onSelect, cvFile, linkedCv, isLinkedCvUnreadable 
 
 const InputFileUpload = ({ cvFile, onSelect }: { cvFile: File | null, onSelect: (file: File | null) => void }) => {
   const inputRef = useRef<HTMLInputElement>(null)
-  const clearFile = () => {
-    if (inputRef.current) {
-      inputRef.current.value = ""
-    }
-    onSelect(null)
-  }
+
+  // The file can be dropped from outside (a stored CV was picked instead): the
+  // input must forget it, or choosing the same PDF again would not fire.
+  useEffect(() => {
+    if (!cvFile && inputRef.current) inputRef.current.value = ""
+  }, [cvFile])
+
+  const clearFile = () => onSelect(null)
 
   const hoverStyle = "hover:border-primary/50 hover:bg-primary/5 transition-all duration-200"
 
