@@ -9,7 +9,10 @@ import { useChatPanel } from "../../_hooks/useChatPanel"
 import { ChatMessageList } from "./ChatMessageList"
 import { motion } from "motion/react"
 
-export function ChatBot({ isOpen, toggle, close }: ReturnType<typeof useChatPanel>) {
+/** Only what the floating button uses: the panel's maximize state is not its business. */
+type ChatBotProps = Pick<ReturnType<typeof useChatPanel>, "isOpen" | "toggle" | "close">
+
+export function ChatBot({ isOpen, toggle, close }: ChatBotProps) {
 
   const { messages, input, setInput, send, isPending, isEnabled, canSend } = useAnalyseChat()
 
