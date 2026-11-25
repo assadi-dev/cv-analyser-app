@@ -23,7 +23,8 @@ function parseLogin(overrides: object) {
 
 function firstError(result: ReturnType<typeof parseRegister>, field: string) {
   if (result.success) return undefined
-  return result.error.flatten().fieldErrors[field as keyof typeof result.error.flatten().fieldErrors]?.[0]
+  const fieldErrors: Record<string, string[] | undefined> = result.error.flatten().fieldErrors
+  return fieldErrors[field]?.[0]
 }
 
 // ─── Register schema ──────────────────────────────────────────────────────────

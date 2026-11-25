@@ -37,7 +37,7 @@ describe("useSSE", () => {
     const { result } = renderHook(() => useSSE(onEvent))
 
     await act(async () => {
-      await result.current.start("/api/test", {})
+      await result.current.start("/api/test", { job_description: "offre" })
     })
 
     expect(onEvent).toHaveBeenCalledTimes(2)
@@ -58,7 +58,7 @@ describe("useSSE", () => {
     const { result } = renderHook(() => useSSE())
 
     await act(async () => {
-      await result.current.start("/api/test", {})
+      await result.current.start("/api/test", { job_description: "offre" })
     })
 
     expect(result.current.state.status).toBe("error")
