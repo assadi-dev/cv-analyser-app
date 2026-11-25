@@ -27,7 +27,9 @@ export default function BoardCard({ card, onOpen }: BoardCardProps) {
     <KanbanItem
       value={card.id}
       className={cn(
-        "flex flex-col gap-2 rounded-[10px] border border-border bg-white p-3",
+        // shrink-0: inside the column's scroll area a card must keep its own
+        // height and push the list into scrolling, never get squeezed to fit.
+        "flex shrink-0 flex-col gap-2 rounded-[10px] border border-border bg-white p-3",
         "transition-shadow hover:shadow-md",
         // The component sets data-dragging="" — an empty value, so a
         // [data-dragging=true] selector would never match.
