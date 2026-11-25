@@ -83,7 +83,8 @@ export function CandidaturesClient() {
   }, [addMutation, addModal.close])
 
   return (
-    <div className="flex flex-col gap-5 p-4 sm:p-8">
+    // h-full: the page fills the window so the table can take what is left.
+    <div className="flex h-full min-h-0 flex-col gap-5 p-4 sm:p-8">
       <CandidaturesHeader onAdd={handleAdd} />
 
       <FilterBar search={search} onSearchChange={setSearch} />

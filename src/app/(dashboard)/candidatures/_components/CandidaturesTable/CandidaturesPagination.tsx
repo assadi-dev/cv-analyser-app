@@ -18,7 +18,7 @@ export function CandidaturesPagination({ table, total }: CandidaturesPaginationP
 
   return (
     <div
-      className="flex items-center gap-3 px-5 h-[52px] border-t"
+      className="flex shrink-0 items-center gap-3 px-5 h-[52px] border-t"
       style={{ borderColor: "var(--color-border)" }}
     >
       <span className="text-[12px]" style={{ color: "var(--color-text-muted)" }}>
