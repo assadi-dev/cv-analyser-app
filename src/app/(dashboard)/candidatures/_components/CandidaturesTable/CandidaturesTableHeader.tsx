@@ -14,7 +14,7 @@ export function CandidaturesTableHeader({ headerGroups }: CandidaturesTableHeade
       {headerGroups.map((headerGroup) => (
         <div
           key={headerGroup.id}
-          className="grid text-[11px] font-bold tracking-wide h-11 px-5 items-center border-b"
+          className="sticky top-0 z-10 grid text-[11px] font-bold tracking-wide h-11 px-5 items-center border-b"
           style={{
             gridTemplateColumns: TABLE_GRID,
             borderColor: "var(--color-border)",

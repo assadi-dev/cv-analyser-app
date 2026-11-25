@@ -43,29 +43,40 @@ export function CandidaturesTable({
   })
 
   return (
+    // flex-1: the card takes the height the page leaves, whatever the row count.
     <div
-      className="rounded-[14px] border overflow-hidden shadow-[var(--shadow-card)]"
+      className="flex min-h-[280px] flex-1 flex-col overflow-hidden rounded-[14px] border shadow-[var(--shadow-card)]"
       style={{ borderColor: "var(--color-border)", background: "white" }}
     >
-      <CandidaturesTableHeader headerGroups={table.getHeaderGroups()} />
+      {/*
+        One scroll area for the header and the rows: the header sticks to its
+        top while the rows scroll, and the pagination stays below it. The
+        min-width keeps the columns readable on a narrow screen, where the
+        area scrolls sideways instead of clipping them.
+      */}
+      <div className="min-h-0 flex-1 overflow-auto">
+        <div className="min-w-[1100px]">
+          <CandidaturesTableHeader headerGroups={table.getHeaderGroups()} />
 
-      {isLoading ? (
-        <CandidaturesTableSkeleton />
-      ) : items.length === 0 ? (
-        <CandidaturesEmptyState />
-      ) : (
-        items.map((item, i) => (
-          <CandidaturesTableRow
-            key={item.id}
-            item={item}
-            index={i}
-            onDelete={onDelete}
-            onView={onView}
-            onEdit={onEdit}
-            onAnalyse={onAnalyse}
-          />
-        ))
-      )}
+          {isLoading ? (
+            <CandidaturesTableSkeleton />
+          ) : items.length === 0 ? (
+            <CandidaturesEmptyState />
+          ) : (
+            items.map((item, i) => (
+              <CandidaturesTableRow
+                key={item.id}
+                item={item}
+                index={i}
+                onDelete={onDelete}
+                onView={onView}
+                onEdit={onEdit}
+                onAnalyse={onAnalyse}
+              />
+            ))
+          )}
+        </div>
+      </div>
 
       <CandidaturesPagination table={table} total={total} />
     </div>
