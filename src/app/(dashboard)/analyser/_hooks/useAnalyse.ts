@@ -12,13 +12,15 @@ import { string } from "zod"
 interface UseAnalyseParams {
   cvFile: File | null
   jobDescription: string
+  /** Candidature to attach the analysis to. Omit for a standalone analysis. */
+  candidatureId?: string
 }
 
 /**
  * Orchestre le lancement de l'analyse :
  * upload CV + fiche de poste → stream SSE → store d'analyse.
  */
-export function useAnalyse({ cvFile, jobDescription }: UseAnalyseParams) {
+export function useAnalyse({ cvFile, jobDescription, candidatureId }: UseAnalyseParams) {
   const toast = useToast()
   const liveResult = useAnalyseStore((s) => s.liveResult)
   const currentAnalyse = useAnalyseStore((s) => s.currentAnalyse)
@@ -31,6 +33,7 @@ export function useAnalyse({ cvFile, jobDescription }: UseAnalyseParams) {
       setLiveResult(event as SSEResultEvent)
     } else if (event.type === "done") {
       setSavedAnalyseId(event.analyse_id)
+      if (candidatureId) toast.success("Analyse rattachée à la candidature")
     } else if (event.type === "error") {
       logError(event.message, "useAnalyse")
       toast.error("L'analyse a échoué", event.message ?? "Erreur lors de l'analyse")
@@ -52,6 +55,7 @@ export function useAnalyse({ cvFile, jobDescription }: UseAnalyseParams) {
       await start(ANALYSE_STREAM_ENDPOINT, {
         job_description: jobDescription,
         cv_file: cvFile,
+        candidature_id: candidatureId,
       })
     } catch (error) {
       logError(error, "useAnalyse.analyse")

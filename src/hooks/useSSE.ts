@@ -36,7 +36,10 @@ export function useSSE(onEvent?: (event: SSEEvent) => void) {
   const [state, setState] = useState<SSEState>(INITIAL_STATE)
   const abortRef = useRef<AbortController | null>(null)
 
-  async function start(url: string, body: { job_description: string, cv_file: File }) {
+  async function start(
+    url: string,
+    body: { job_description: string; cv_file: File; candidature_id?: string }
+  ) {
     // Cancel any in-progress stream
     abortRef.current?.abort()
     const controller = new AbortController()
@@ -49,6 +52,7 @@ export function useSSE(onEvent?: (event: SSEEvent) => void) {
     const formData = new FormData()
     formData.append("job_description", body.job_description)
     formData.append("cv_file", body.cv_file)
+    if (body.candidature_id) formData.append("candidature_id", body.candidature_id)
 
     try {
       const res = await fetch(apiUrl, {

@@ -20,10 +20,11 @@ export const POST = async (req: NextRequest) => {
             return NextResponse.json({ error: "Invalid request body", details: parsedBody.error.issues }, { status: 400 });
         }
 
-        const { job_description, cv_file } = parsedBody.data
+        const { job_description, cv_file, candidature_id } = parsedBody.data
         const formData = new FormData();
         formData.append("job_description", job_description);
         formData.append("cv_file", cv_file);
+        if (candidature_id) formData.append("candidature_id", candidature_id);
 
         const res = await apiExternal.multipart(`/api/v1/analyses/temporary/stream`, formData, options)
 

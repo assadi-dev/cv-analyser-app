@@ -9,6 +9,9 @@ export const ANALYSE_CHAT_HISTORY_ENDPOINT = "/api/chat/history"
 
 export const ANALYSE_CHAT_MUTATION_KEY = "analyse-chat"
 
+/** Cache key of the candidature an analysis is launched for. */
+export const ANALYSE_CANDIDATURE_QUERY_KEY = "analyse-candidature"
+
 export interface SendChatMessagePayload {
   analyse_id: string
   message: string
