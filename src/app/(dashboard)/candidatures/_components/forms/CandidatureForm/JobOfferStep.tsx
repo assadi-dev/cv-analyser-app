@@ -5,14 +5,14 @@ import { CVSection } from "./CVSection"
 
 /**
  * Step 1 — the offer and the CV sent with it. The text is required when
- * creating and optional when editing; a new CV can only be imported when
- * creating, editing picks among the CVs already uploaded.
+ * creating and optional when editing; the CV is picked among the user's
+ * uploaded ones, or imported on the spot.
  */
 export function JobOfferStep({ mode }: CandidatureStepProps) {
   return (
     <StepLayout
       left={<JobDescriptionSection required={mode === "create"} />}
-      right={<CVSection showUpload={mode === "create"} />}
+      right={<CVSection />}
     />
   )
 }

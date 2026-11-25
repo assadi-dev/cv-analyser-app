@@ -17,12 +17,7 @@ import { CVUploadZone } from "./CVUploadZone"
 /** Radix Select cannot hold an empty value, so "no CV" needs a stand-in. */
 const NO_CV = "none"
 
-interface CVSectionProps {
-  /** Also offer importing a new CV. Only when creating — see CVUploadZone. */
-  showUpload?: boolean
-}
-
-export function CVSection({ showUpload = true }: CVSectionProps) {
+export function CVSection() {
   const form = useFormContext<CandidatureFormValues>()
   const { cvs, isLoading } = useCvs()
 
@@ -39,7 +34,15 @@ export function CVSection({ showUpload = true }: CVSectionProps) {
             <Select
               // The form keeps "no CV" as an empty string, which is what the
               // payload turns into null.
-              onValueChange={(value) => field.onChange(value === NO_CV ? "" : value)}
+              onValueChange={(value) => {
+                // Radix's hidden native <select> reports "" when it is handed a
+                // value whose option has not mounted yet — right after a CV is
+                // imported and selected, before the list has caught up. No item
+                // carries "", so it is never a choice: taking it would unselect
+                // the CV that was just linked.
+                if (!value) return
+                field.onChange(value === NO_CV ? "" : value)
+              }}
               value={field.value || NO_CV}
             >
               <FormControl>
@@ -73,7 +76,7 @@ export function CVSection({ showUpload = true }: CVSectionProps) {
         )}
       />
 
-      {showUpload && <CVUploadZone />}
+      <CVUploadZone />
     </div>
   )
 }

@@ -1,11 +1,12 @@
 "use client"
 
 import { useRef, useState, useCallback, useEffect } from "react"
-import { useFormContext, useWatch } from "react-hook-form"
+import { useFormContext } from "react-hook-form"
 import { toast } from "sonner"
-import { Upload, X, CheckCircle } from "lucide-react"
+import { Upload, LoaderCircle } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
+import { useUploadCv } from "@/app/(dashboard)/parametres/_hooks/useUploadCv"
 import type { CandidatureFormValues } from "../../../_lib/candidature.schema"
 
 const MAX_MB = 2
@@ -28,34 +29,41 @@ function validatePDF(f: File): boolean {
 /**
  * "Import a new CV" — the divider and the PDF dropzone.
  *
- * Mounted only where a new CV can be offered (creation): the paste listener it
- * registers on `window` should not exist anywhere else.
+ * A dropped file is imported at once: the API keeps it with the user's other
+ * CVs, and the new CV becomes the one linked to the candidature. The form
+ * only ever holds the CV's id, never the file.
  */
 export function CVUploadZone() {
   const form = useFormContext<CandidatureFormValues>()
-  // Held by the form, not by local state: this step unmounts when the user
-  // moves on, and the file must still be there when they come back.
-  const file = useWatch({ control: form.control, name: "cv_file" })
-  const setFile = useCallback(
-    (next: File | null) => form.setValue("cv_file", next, { shouldDirty: true }),
-    [form]
-  )
+  const { mutateAsync: upload, isPending } = useUploadCv()
+  const [uploadingName, setUploadingName] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const zoneRef = useRef<HTMLDivElement>(null)
 
   const handleFile = useCallback(
-    (f: File) => {
-      if (validatePDF(f)) setFile(f)
+    async (f: File) => {
+      if (isPending || !validatePDF(f)) return
+      setUploadingName(f.name)
+      try {
+        // `mutateAsync` rather than `mutate` callbacks: those are skipped when
+        // this step has unmounted, and the CV must still end up linked.
+        const cv = await upload(f)
+        form.setValue("cv_id", cv.id, { shouldDirty: true })
+      } catch {
+        // Already reported: useUploadCv logs it and shows the error toast.
+      } finally {
+        setUploadingName(null)
+      }
     },
-    [setFile]
+    [form, isPending, upload]
   )
 
   // ── Paste global ─────────────────────────────────────────────────────────
   useEffect(() => {
     const onPaste = (e: ClipboardEvent) => {
       const f = e.clipboardData?.files[0]
-      if (f) handleFile(f)
+      if (f) void handleFile(f)
     }
     window.addEventListener("paste", onPaste)
     return () => window.removeEventListener("paste", onPaste)
@@ -77,7 +85,7 @@ export function CVUploadZone() {
     e.preventDefault()
     setIsDragging(false)
     const f = e.dataTransfer.files[0]
-    if (f) handleFile(f)
+    if (f) void handleFile(f)
   }
 
   return (
@@ -91,24 +99,16 @@ export function CVUploadZone() {
         <Separator className="flex-1 bg-[#E2E8F0]" />
       </div>
 
-      {/* File preview */}
-      {file ? (
-        <div className="flex items-center gap-3 h-[64px] px-4 rounded-[10px] bg-[#F0FDF4] border border-[#A7F3D0]">
-          <CheckCircle size={16} className="text-[#10B981] shrink-0" />
+      {isPending ? (
+        <div
+          role="status"
+          className="flex items-center gap-3 h-[72px] px-4 rounded-[10px] bg-[#F8FAFC] border border-[#E2E8F0]"
+        >
+          <LoaderCircle size={16} className="animate-spin text-[#7C3AED] shrink-0" aria-hidden="true" />
           <div className="flex-1 min-w-0">
-            <p className="text-[12px] font-semibold text-[#065F46] truncate">{file.name}</p>
-            <p className="text-[10px] text-[#34D399]">
-              {(file.size / 1024 / 1024).toFixed(2)} Mo
-            </p>
+            <p className="text-[12px] font-semibold text-[#374151] truncate">{uploadingName}</p>
+            <p className="text-[10px] text-[#94A3B8]">Importation en cours…</p>
           </div>
-          <button
-            type="button"
-            onClick={() => setFile(null)}
-            className="w-6 h-6 rounded-full bg-[#D1FAE5] flex items-center justify-center hover:bg-[#A7F3D0] transition-colors shrink-0"
-            aria-label="Supprimer le fichier"
-          >
-            <X size={12} className="text-[#065F46]" />
-          </button>
         </div>
       ) : (
         /* Dropzone */
@@ -133,7 +133,7 @@ export function CVUploadZone() {
             className="hidden"
             onChange={(e) => {
               const f = e.target.files?.[0]
-              if (f) handleFile(f)
+              if (f) void handleFile(f)
               e.target.value = ""
             }}
           />

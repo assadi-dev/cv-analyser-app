@@ -19,12 +19,6 @@ export const candidatureSchema = z.object({
   contacts:        z.array(contactSchema).default([]),
   job_description: z.string().optional().default(""),
   cv_id:           z.string().optional().default(""),
-  // Lives in the form rather than in the dropzone's local state: the CV step
-  // unmounts when the user moves on, and going back must still show the file.
-  cv_file:         z
-    .custom<File | null>((value) => value === null || (typeof File !== "undefined" && value instanceof File))
-    .nullable()
-    .default(null),
   notes:           z.string().optional().default(""),
 })
 
@@ -51,6 +45,5 @@ export const CANDIDATURE_FORM_DEFAULTS: CandidatureFormValues = {
   contacts:        [],
   job_description: "",
   cv_id:           "",
-  cv_file:         null,
   notes:           "",
 }

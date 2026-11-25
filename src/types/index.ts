@@ -42,9 +42,7 @@ export interface CV {
   updated_at: string
 }
 
-export interface CVSummary extends Omit<CV, "key"> {
-  url: string
-}
+export type CVSummary = Omit<CV, "key">
 
 // ─── Candidature ─────────────────────────────────────────────────────────────
 
