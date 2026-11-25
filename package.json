@@ -2,6 +2,9 @@
   "name": "cv-analyser-app",
   "version": "0.1.0",
   "private": true,
+  "engine": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
