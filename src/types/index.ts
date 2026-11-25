@@ -94,6 +94,11 @@ export interface CandidatureSummary {
   source_url?: string | null
   company_city?: string | null
   notes?: string | null
+  // Only on the single-candidature endpoint, not on list rows.
+  job_description?: string | null
+  analyse_id?: string | null
+  cv_id?: string | null
+  contacts?: Contact[]
   created_at: string
   updated_at: string
 }

@@ -20,6 +20,8 @@ export interface CreateCandidaturePayload {
   status: CandidatureStatus
   notes?: string | null
   cv_id?: string | null
+  /** Required: it is what the candidature's analyses are pre-filled from. */
+  job_description: string
   contacts?: { name: string; contact_type: ContactType; value: string }[]
 }
 
@@ -35,11 +37,17 @@ export interface UpdateCandidaturePayload {
   work_mode?: WorkMode
   source_platform?: string | null
   source_url?: string | null
+  job_description?: string | null
+  cv_id?: string | null
   status?: CandidatureStatus
   notes?: string | null
+  /** Replaces the whole contact list when present; leave out to keep it. */
+  contacts?: { name: string; contact_type: ContactType; value: string }[]
 }
 
 export const CANDIDATURES_QUERY_KEY = "candidatures"
+/** One candidature, read in full — the list rows do not carry the job description. */
+export const CANDIDATURE_QUERY_KEY = "candidature"
 export const PAGE_SIZE = 10
 
 export interface FetchCandidaturesParams {

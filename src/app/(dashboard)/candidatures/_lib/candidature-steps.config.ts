@@ -15,52 +15,36 @@ export interface CandidatureStepConfig {
   fields: FieldPath<CandidatureFormValues>[]
 }
 
-const COMPANY_STEP: CandidatureStepConfig = {
-  id: "company",
-  label: "Entreprise",
-  fields: [
-    "company_name",
-    "company_city",
-    "job_title",
-    "contract_type",
-    "work_mode",
-    "source_platform",
-    "source_name",
-    "source_url",
-    "status",
-  ],
-}
-
-const CREATE_STEPS: CandidatureStepConfig[] = [
+/**
+ * The same three steps whether creating or editing — only what each shows
+ * differs (see `CandidatureStepProps.mode`).
+ */
+export const CANDIDATURE_STEPS: CandidatureStepConfig[] = [
   {
     id: "offer",
     label: "Fiche de poste & CV",
-    // Nothing is required here: the offer text and the CV are both optional.
-    fields: [],
+    // The offer text is required when creating, optional when editing (the
+    // schema decides); the CV is always optional.
+    fields: ["job_description", "cv_id"],
   },
-  COMPANY_STEP,
+  {
+    id: "company",
+    label: "Entreprise",
+    fields: [
+      "company_name",
+      "company_city",
+      "job_title",
+      "contract_type",
+      "work_mode",
+      "source_platform",
+      "source_name",
+      "source_url",
+      "status",
+    ],
+  },
   {
     id: "followup",
     label: "Contacts & notes",
     fields: ["contacts", "notes"],
   },
 ]
-
-/**
- * Editing leaves the offer step out: the API's PATCH takes neither the job
- * description nor contacts, and the CV list is not wired yet, so the step
- * would have nothing to edit.
- */
-const EDIT_STEPS: CandidatureStepConfig[] = [
-  COMPANY_STEP,
-  {
-    id: "followup",
-    label: "Notes",
-    fields: ["notes"],
-  },
-]
-
-export const CANDIDATURE_STEPS_BY_MODE: Record<CandidatureMode, CandidatureStepConfig[]> = {
-  create: CREATE_STEPS,
-  edit: EDIT_STEPS,
-}

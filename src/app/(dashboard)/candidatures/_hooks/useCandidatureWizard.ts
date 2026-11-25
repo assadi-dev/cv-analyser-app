@@ -6,11 +6,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { logError } from "@/lib/logger"
 import {
   candidatureSchema,
+  candidatureCreateSchema,
   CANDIDATURE_FORM_DEFAULTS,
   type CandidatureFormValues,
 } from "../_lib/candidature.schema"
 import {
-  CANDIDATURE_STEPS_BY_MODE,
+  CANDIDATURE_STEPS,
   type CandidatureMode,
 } from "../_lib/candidature-steps.config"
 
@@ -25,7 +26,7 @@ interface StepState {
 const FIRST_STEP: StepState = { index: 0, direction: 1 }
 
 interface UseCandidatureWizardOptions {
-  /** `create` walks every step; `edit` skips what the API cannot update. */
+  /** Whether the form creates a candidature or edits one. */
   mode?: CandidatureMode
   /** Pre-fills the form. Read once, when the wizard mounts. */
   initialValues?: CandidatureFormValues
@@ -41,11 +42,11 @@ export function useCandidatureWizard(
   onSubmit: (values: CandidatureFormValues) => void,
   { mode = "create", initialValues }: UseCandidatureWizardOptions = {}
 ) {
-  const steps = CANDIDATURE_STEPS_BY_MODE[mode]
+  const steps = CANDIDATURE_STEPS
   const lastStepIndex = steps.length - 1
 
   const form = useForm<CandidatureFormValues>({
-    resolver: zodResolver(candidatureSchema),
+    resolver: zodResolver(mode === "create" ? candidatureCreateSchema : candidatureSchema),
     defaultValues: initialValues ?? CANDIDATURE_FORM_DEFAULTS,
   })
   const [step, setStep] = useState<StepState>(FIRST_STEP)

@@ -24,6 +24,7 @@ function toPayload(values: CandidatureFormValues): CreateCandidaturePayload {
     status:          values.status,
     notes:           values.notes || null,
     cv_id:           values.cv_id || null,
+    job_description: values.job_description,
     contacts:        values.contacts,
   }
 }

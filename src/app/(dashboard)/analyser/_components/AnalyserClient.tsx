@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import { useAnalyse } from "../_hooks/useAnalyse"
 import { useAnalyseCandidature } from "../_hooks/useAnalyseCandidature"
 import { useChatPanel } from "../_hooks/useChatPanel"
@@ -22,8 +23,21 @@ interface AnalyserClientProps {
 export function AnalyserClient({ candidatureId }: AnalyserClientProps) {
   const { cvFile, selectCv } = useCvUpload()
   const { jobDescription, setJobDescription } = useJobDescription()
-  const { candidature, isLoading: isCandidatureLoading, isError: isCandidatureError } =
-    useAnalyseCandidature(candidatureId)
+  const {
+    candidature,
+    jobDescription: candidatureJobDescription,
+    isLoading: isCandidatureLoading,
+    isError: isCandidatureError,
+  } = useAnalyseCandidature(candidatureId)
+
+  // Pre-fill once, when the offer arrives: a later refetch must not overwrite
+  // what the user has edited since.
+  const hasPrefilled = useRef(false)
+  useEffect(() => {
+    if (hasPrefilled.current || !candidatureJobDescription) return
+    hasPrefilled.current = true
+    setJobDescription(candidatureJobDescription)
+  }, [candidatureJobDescription, setJobDescription])
   const { result, isStreaming, canAnalyse, progress, currentStep, analyse } = useAnalyse({
     cvFile,
     jobDescription,
@@ -42,6 +56,7 @@ export function AnalyserClient({ candidatureId }: AnalyserClientProps) {
             candidature={candidature}
             isLoading={isCandidatureLoading}
             isError={isCandidatureError}
+            isJobDescriptionPrefilled={Boolean(candidatureJobDescription)}
           />
         )}
 

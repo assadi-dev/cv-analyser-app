@@ -5,6 +5,8 @@ interface CandidatureContextBannerProps {
   candidature: CandidatureSummary | undefined
   isLoading: boolean
   isError: boolean
+  /** The job description field was pre-filled from the candidature. */
+  isJobDescriptionPrefilled?: boolean
 }
 
 /**
@@ -18,6 +20,7 @@ export function CandidatureContextBanner({
   candidature,
   isLoading,
   isError,
+  isJobDescriptionPrefilled = false,
 }: CandidatureContextBannerProps) {
   if (isLoading) {
     return (
@@ -51,11 +54,16 @@ export function CandidatureContextBanner({
       className="flex items-center gap-3 rounded-[12px] border border-primary-light bg-primary-light/50 px-4 py-3"
     >
       <Link2 size={15} className="shrink-0 text-primary" aria-hidden="true" />
-      <p className="min-w-0 text-[12px] text-text-secondary">
-        Analyse rattachée à{" "}
-        <span className="font-bold text-text-primary">{candidature.company_name}</span>
-        <span className="text-text-muted"> · {candidature.job_title}</span>
-      </p>
+      <div className="min-w-0 text-[12px]">
+        <p className="text-text-secondary">
+          Analyse rattachée à{" "}
+          <span className="font-bold text-text-primary">{candidature.company_name}</span>
+          <span className="text-text-muted"> · {candidature.job_title}</span>
+        </p>
+        {isJobDescriptionPrefilled && (
+          <p className="text-text-muted">Fiche de poste pré-remplie depuis la candidature.</p>
+        )}
+      </div>
     </div>
   )
 }

@@ -1,26 +1,34 @@
 "use client"
 
 import { Pencil } from "lucide-react"
-import type { CandidatureSummary } from "@/types"
+import { useCandidature } from "../../_hooks/useCandidature"
+import { candidatureToFormValues, toUpdatePayload } from "../../_lib/candidature.mapper"
+import type { UpdateCandidaturePayload } from "../../_api/candidatures.api"
 import { CandidatureWizardModal } from "./CandidatureWizardModal"
-import { candidatureToFormValues } from "../../_lib/candidature.mapper"
-import type { CandidatureFormValues } from "../../_lib/candidature.schema"
+import { CandidatureModalFallback } from "./CandidatureModalFallback"
 
 interface EditCandidatureModalProps {
   /** The candidature being edited — `undefined` keeps the modal closed. */
-  candidature: CandidatureSummary | undefined
+  candidatureId: string | undefined
   onClose: () => void
-  onSubmit: (values: CandidatureFormValues) => void
+  /** Receives only what changed; empty when the form was left as it was. */
+  onSubmit: (candidatureId: string, changes: UpdateCandidaturePayload) => void
   isPending: boolean
 }
 
 export function EditCandidatureModal({
-  candidature,
+  candidatureId,
   onClose,
   onSubmit,
   isPending,
 }: EditCandidatureModalProps) {
-  if (!candidature) return null
+  // The list rows do not carry the job description, so the modal reads the
+  // candidature in full when it opens — and diffs against that same copy.
+  const { data: candidature, isError } = useCandidature(candidatureId)
+
+  if (!candidatureId) return null
+  if (isError) return <CandidatureModalFallback state="error" onClose={onClose} />
+  if (!candidature) return <CandidatureModalFallback state="loading" onClose={onClose} />
 
   return (
     <CandidatureWizardModal
@@ -32,7 +40,7 @@ export function EditCandidatureModal({
       icon={<Pencil size={15} style={{ color: "#7C3AED" }} />}
       initialValues={candidatureToFormValues(candidature)}
       onClose={onClose}
-      onSubmit={onSubmit}
+      onSubmit={(values) => onSubmit(candidature.id, toUpdatePayload(candidature, values))}
       isPending={isPending}
     />
   )

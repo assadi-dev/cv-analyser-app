@@ -28,6 +28,14 @@ export const candidatureSchema = z.object({
   notes:           z.string().optional().default(""),
 })
 
+/**
+ * What creating a candidature requires on top of `candidatureSchema`: the job
+ * description. Editing does not show that field, so it uses the base schema.
+ */
+export const candidatureCreateSchema = candidatureSchema.extend({
+  job_description: z.string().trim().min(1, "La fiche de poste est requise"),
+})
+
 export type CandidatureFormValues = z.infer<typeof candidatureSchema>
 
 export const CANDIDATURE_FORM_DEFAULTS: CandidatureFormValues = {

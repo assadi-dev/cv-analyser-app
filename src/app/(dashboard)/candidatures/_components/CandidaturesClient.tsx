@@ -3,7 +3,6 @@
 import { useCallback, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { useModal } from "@/hooks/useModal"
-import type { CandidatureSummary } from "@/types"
 import { useCandidaturesParams } from "../_hooks/useCandidaturesParams"
 import { useCandidatures } from "../_hooks/useCandidatures"
 import { useAddCandidature } from "../_hooks/useAddCandidature"
@@ -16,7 +15,7 @@ import { CandidaturesTable } from "./CandidaturesTable/CandidaturesTable"
 import { DeleteConfirmModal } from "./modals/DeleteConfirmModal"
 import { AddCandidatureModal } from "./modals/AddCandidatureModal"
 import { EditCandidatureModal } from "./modals/EditCandidatureModal"
-import { toUpdatePayload } from "../_lib/candidature.mapper"
+import type { UpdateCandidaturePayload } from "../_api/candidatures.api"
 import type { CandidatureFormValues } from "../_lib/candidature.schema"
 
 export function CandidaturesClient() {
@@ -28,7 +27,7 @@ export function CandidaturesClient() {
   const router = useRouter()
   const deleteModal = useModal<string>()
   const addModal = useModal()
-  const editModal = useModal<CandidatureSummary>()
+  const editModal = useModal<string>()
 
   const filtered = useMemo(
     () =>
@@ -55,27 +54,18 @@ export function CandidaturesClient() {
     // TODO: navigate to candidature detail
   }, [])
 
-  const handleEditRequest = useCallback(
-    (id: string) => {
-      const target = candidatures.find((item) => item.id === id)
-      if (target) editModal.open(target)
-    },
-    [candidatures, editModal.open]
-  )
+  const handleEditRequest = useCallback((id: string) => editModal.open(id), [editModal.open])
 
   const handleEditSubmit = useCallback(
-    (values: CandidatureFormValues) => {
-      const target = editModal.modalProps
-      if (!target) return
-      const payload = toUpdatePayload(target, values)
+    (id: string, payload: UpdateCandidaturePayload) => {
       // Nothing changed: no request, no "modified" toast for an untouched form.
       if (Object.keys(payload).length === 0) {
         editModal.close()
         return
       }
-      updateMutation({ id: target.id, payload }, { onSuccess: editModal.close })
+      updateMutation({ id, payload }, { onSuccess: editModal.close })
     },
-    [editModal.modalProps, editModal.close, updateMutation]
+    [editModal.close, updateMutation]
   )
 
   // The analysis itself runs on the Analyser page, which needs the CV and the
@@ -126,7 +116,7 @@ export function CandidaturesClient() {
       />
 
       <EditCandidatureModal
-        candidature={editModal.modalProps}
+        candidatureId={editModal.modalProps}
         onClose={editModal.close}
         onSubmit={handleEditSubmit}
         isPending={isUpdating}
