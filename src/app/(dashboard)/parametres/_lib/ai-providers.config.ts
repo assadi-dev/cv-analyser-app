@@ -51,5 +51,7 @@ export const AI_PROVIDERS: AIProviderConfig[] = [
 ]
 
 export function getAIProvider(id: AIProvider): AIProviderConfig {
-  return AI_PROVIDERS.find((p) => p.id === id) ?? AI_PROVIDERS[0]
+  const provider = AI_PROVIDERS.find((p) => p.id === id) ?? AI_PROVIDERS[0]
+  if (!provider) throw new Error("No AI provider is configured")
+  return provider
 }
