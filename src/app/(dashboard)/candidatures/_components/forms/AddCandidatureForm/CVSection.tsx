@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState, useCallback, useEffect } from "react"
-import { useFormContext } from "react-hook-form"
+import { useFormContext, useWatch } from "react-hook-form"
 import { toast } from "sonner"
 import { FileText, Upload, X, CheckCircle } from "lucide-react"
 import {
@@ -35,14 +35,23 @@ function validatePDF(f: File): boolean {
 
 export function CVSection() {
   const form = useFormContext<AddCandidatureFormValues>()
-  const [file, setFile] = useState<File | null>(null)
+  // Held by the form, not by local state: this step unmounts when the user
+  // moves on, and the file must still be there when they come back.
+  const file = useWatch({ control: form.control, name: "cv_file" })
+  const setFile = useCallback(
+    (next: File | null) => form.setValue("cv_file", next, { shouldDirty: true }),
+    [form]
+  )
   const [isDragging, setIsDragging] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const zoneRef = useRef<HTMLDivElement>(null)
 
-  const handleFile = useCallback((f: File) => {
-    if (validatePDF(f)) setFile(f)
-  }, [])
+  const handleFile = useCallback(
+    (f: File) => {
+      if (validatePDF(f)) setFile(f)
+    },
+    [setFile]
+  )
 
   // ── Paste global ─────────────────────────────────────────────────────────
   useEffect(() => {

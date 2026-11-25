@@ -9,19 +9,18 @@ export function JobDescriptionSection() {
   const form = useFormContext<AddCandidatureFormValues>()
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
       <p className="text-[12px] font-bold text-[#374151] tracking-[0.3px]">Fiche de poste</p>
       <FormField
         control={form.control}
         name="job_description"
         render={({ field }) => (
-          <FormItem className="space-y-0">
+          <FormItem className="flex min-h-0 flex-1 flex-col space-y-0">
             <FormControl>
               <Textarea
                 {...field}
                 placeholder="Collez la description du poste ici (missions, compétences, expérience requise)..."
-                rows={7}
-                className="rounded-[10px] bg-white border-[#E2E8F0] text-[12px] text-[#374151] placeholder:text-[#94A3B8] focus-visible:ring-1 focus-visible:ring-[#7C3AED]/30 focus-visible:ring-offset-0 resize-none leading-[1.5]"
+                className="min-h-[200px] flex-1 rounded-[10px] bg-white border-[#E2E8F0] text-[12px] text-[#374151] placeholder:text-[#94A3B8] focus-visible:ring-1 focus-visible:ring-[#7C3AED]/30 focus-visible:ring-offset-0 resize-none leading-[1.5]"
               />
             </FormControl>
           </FormItem>

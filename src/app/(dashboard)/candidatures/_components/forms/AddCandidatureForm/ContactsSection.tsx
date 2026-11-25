@@ -14,6 +14,7 @@ import {
   FormField,
   FormItem,
   FormControl,
+  FormMessage,
 } from "@/components/ui/form"
 import type { AddCandidatureFormValues } from "../../../_lib/add-candidature.schema"
 
@@ -49,6 +50,13 @@ export function ContactsSection() {
         </button>
       </div>
 
+      {fields.length === 0 && (
+        <p className="rounded-[10px] border border-dashed border-[#E2E8F0] px-4 py-6 text-center text-[12px] text-[#94A3B8]">
+          Aucun contact pour l&apos;instant. Ajoutez un recruteur ou un
+          manager à relancer.
+        </p>
+      )}
+
       {fields.map((field, i) => (
         <div
           key={field.id}
@@ -71,6 +79,7 @@ export function ContactsSection() {
                       />
                     </div>
                   </FormControl>
+                  <FormMessage className="text-[11px]" />
                 </FormItem>
               )}
             />
@@ -119,6 +128,7 @@ export function ContactsSection() {
                       className={INPUT_CLS}
                     />
                   </FormControl>
+                  <FormMessage className="text-[11px]" />
                 </FormItem>
               )}
             />
