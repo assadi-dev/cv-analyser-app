@@ -25,6 +25,7 @@ export function AnalyserClient({ candidatureId }: AnalyserClientProps) {
   const { jobDescription, setJobDescription } = useJobDescription()
   const {
     candidature,
+    linkedCv,
     jobDescription: candidatureJobDescription,
     isLoading: isCandidatureLoading,
     isError: isCandidatureError,
@@ -44,6 +45,7 @@ export function AnalyserClient({ candidatureId }: AnalyserClientProps) {
     // Only an id the API confirmed is sent: a wrong one would fail the whole
     // analysis with a 404 instead of just leaving it unattached.
     candidatureId: candidature?.id,
+    linkedCvId: linkedCv?.id,
   })
   const { isOpen, toggle, close } = useChatPanel()
 
@@ -60,7 +62,7 @@ export function AnalyserClient({ candidatureId }: AnalyserClientProps) {
           />
         )}
 
-        <CvUploadCard onSelect={selectCv} cvFile={cvFile} />
+        <CvUploadCard onSelect={selectCv} cvFile={cvFile} linkedCv={linkedCv} />
 
         <JobDescriptionCard
           value={jobDescription}

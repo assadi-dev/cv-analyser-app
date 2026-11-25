@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { fetchCandidature } from "@/app/(dashboard)/candidatures/_api/candidatures.api"
 import { ANALYSE_CANDIDATURE_QUERY_KEY } from "../_api/analyse.api"
+import { CVS_QUERY_KEY, fetchCvs } from "@/app/(dashboard)/parametres/_api/cvs.api"
 import { fetchAnalyseDetails } from "../_api/chat-message.api"
 import { ANALYSE_DETAILS_QUERY_KEY } from "../_api/queries"
 
@@ -34,9 +35,23 @@ export function useAnalyseCandidature(candidatureId: string | undefined) {
     retry: false,
   })
 
+  // The CV linked to the candidature, so the analysis can run on it as it is.
+  // The list is only fetched when there is one to name.
+  const linkedCvId = data?.cv_id ?? undefined
+  const { data: cvs } = useQuery({
+    queryKey: [CVS_QUERY_KEY],
+    queryFn: fetchCvs,
+    enabled: Boolean(linkedCvId),
+  })
+  const linkedCv = linkedCvId
+    ? { id: linkedCvId, name: cvs?.find((cv) => cv.id === linkedCvId)?.name }
+    : undefined
+
   return {
     /** Set only once the API confirmed the candidature is the user's. */
     candidature: data,
+    /** The CV stored on the candidature; `name` is missing until the list loads. */
+    linkedCv,
     /** Text to pre-fill the job description with, when there is one. */
     jobDescription: storedJobDescription ?? (linkedAnalyse?.job_description?.trim() || undefined),
     isLoading: Boolean(candidatureId) && isLoading,

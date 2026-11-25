@@ -5,14 +5,17 @@ import { Badge } from "@/components/ui/Badge"
 import { Card, CardHeader } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
 import { useRef } from "react"
+import { LinkedCvNotice } from "./LinkedCvNotice"
 
 
 interface CvUploadCardProps {
   onSelect: (file: File | null) => void
   cvFile: File | null
+  /** The CV stored on the candidature the page was opened from, if any. */
+  linkedCv?: { id: string; name: string | undefined }
 }
 
-export function CvUploadCard({ onSelect, cvFile }: CvUploadCardProps) {
+export function CvUploadCard({ onSelect, cvFile, linkedCv }: CvUploadCardProps) {
   return (
     <Card>
       <CardHeader
@@ -20,6 +23,8 @@ export function CvUploadCard({ onSelect, cvFile }: CvUploadCardProps) {
         title="CV du Candidat"
         action={<Badge variant="purple">PDF</Badge>}
       />
+
+      {linkedCv && <LinkedCvNotice name={linkedCv.name} isReplaced={cvFile !== null} />}
 
       <InputFileUpload cvFile={cvFile} onSelect={onSelect} />
 

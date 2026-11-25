@@ -14,13 +14,18 @@ interface UseAnalyseParams {
   jobDescription: string
   /** Candidature to attach the analysis to. Omit for a standalone analysis. */
   candidatureId?: string
+  /**
+   * The CV already stored for that candidature. Used when no file is chosen,
+   * so launching from a candidature does not mean uploading its CV again.
+   */
+  linkedCvId?: string
 }
 
 /**
  * Orchestre le lancement de l'analyse :
  * upload CV + fiche de poste → stream SSE → store d'analyse.
  */
-export function useAnalyse({ cvFile, jobDescription, candidatureId }: UseAnalyseParams) {
+export function useAnalyse({ cvFile, jobDescription, candidatureId, linkedCvId }: UseAnalyseParams) {
   const toast = useToast()
   const liveResult = useAnalyseStore((s) => s.liveResult)
   const currentAnalyse = useAnalyseStore((s) => s.currentAnalyse)
@@ -43,10 +48,11 @@ export function useAnalyse({ cvFile, jobDescription, candidatureId }: UseAnalyse
   const { state, start, reset: resetStream } = useSSE(handleEvent)
 
   const isStreaming = state.status === "streaming" || state.status === "connecting"
-  const canAnalyse = cvFile !== null && jobDescription.trim().length > 0 && !isStreaming
+  const hasCv = cvFile !== null || Boolean(linkedCvId)
+  const canAnalyse = hasCv && jobDescription.trim().length > 0 && !isStreaming
 
   async function analyse() {
-    if (!cvFile || !canAnalyse) return
+    if (!canAnalyse) return
 
     resetAnalyseStore()
     resetStream()
@@ -54,7 +60,9 @@ export function useAnalyse({ cvFile, jobDescription, candidatureId }: UseAnalyse
     try {
       await start(ANALYSE_STREAM_ENDPOINT, {
         job_description: jobDescription,
-        cv_file: cvFile,
+        // A file chosen for this analysis replaces the stored CV.
+        cv_file: cvFile ?? undefined,
+        cv_id: cvFile ? undefined : linkedCvId,
         candidature_id: candidatureId,
       })
     } catch (error) {

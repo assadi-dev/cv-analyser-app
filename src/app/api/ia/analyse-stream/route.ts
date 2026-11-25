@@ -20,10 +20,12 @@ export const POST = async (req: NextRequest) => {
             return NextResponse.json({ error: "Invalid request body", details: parsedBody.error.issues }, { status: 400 });
         }
 
-        const { job_description, cv_file, candidature_id } = parsedBody.data
+        const { job_description, cv_file, cv_id, candidature_id } = parsedBody.data
         const formData = new FormData();
         formData.append("job_description", job_description);
-        formData.append("cv_file", cv_file);
+        // A file wins over a stored CV, as it does in the API.
+        if (cv_file) formData.append("cv_file", cv_file);
+        else if (cv_id) formData.append("cv_id", cv_id);
         if (candidature_id) formData.append("candidature_id", candidature_id);
 
         const res = await apiExternal.multipart(`/api/v1/analyses/temporary/stream`, formData, options)

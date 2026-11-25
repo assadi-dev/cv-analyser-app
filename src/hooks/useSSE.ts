@@ -38,7 +38,13 @@ export function useSSE(onEvent?: (event: SSEEvent) => void) {
 
   async function start(
     url: string,
-    body: { job_description: string; cv_file: File; candidature_id?: string }
+    body: {
+      job_description: string
+      /** The CV as a file — or leave it out and send `cv_id` for a stored one. */
+      cv_file?: File
+      cv_id?: string
+      candidature_id?: string
+    }
   ) {
     // Cancel any in-progress stream
     abortRef.current?.abort()
@@ -51,7 +57,8 @@ export function useSSE(onEvent?: (event: SSEEvent) => void) {
     const apiUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? ""}${url}`
     const formData = new FormData()
     formData.append("job_description", body.job_description)
-    formData.append("cv_file", body.cv_file)
+    if (body.cv_file) formData.append("cv_file", body.cv_file)
+    if (body.cv_id) formData.append("cv_id", body.cv_id)
     if (body.candidature_id) formData.append("candidature_id", body.candidature_id)
 
     try {
