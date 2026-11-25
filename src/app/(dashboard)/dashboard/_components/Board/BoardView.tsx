@@ -84,7 +84,7 @@ export default function BoardView({
       onDragStart={handleDragStart}
       onDragEnd={(event) => setDroppedCardId(String(event.active.id))}
     >
-      <KanbanBoard className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <KanbanBoard className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:min-h-0 lg:flex-1 lg:grid-cols-5 lg:grid-rows-[minmax(0,1fr)]">
         {BOARD_COLUMNS.map((column) => {
           const cards = board[column.status] ?? []
           return (
@@ -92,11 +92,11 @@ export default function BoardView({
               key={column.status}
               value={column.status}
               className={cn(
-                "flex min-h-[400px] flex-col gap-2.5 rounded-[12px] p-3",
+                "flex min-h-[400px] flex-col gap-2.5 rounded-[12px] p-3 lg:min-h-0 lg:overflow-hidden",
                 column.surface
               )}
             >
-              <div className="flex items-center gap-2 pb-1">
+              <div className="flex shrink-0 items-center gap-2 pb-1">
                 <span
                   className={cn("h-2 w-2 shrink-0 rounded-full", column.dot)}
                   aria-hidden="true"
@@ -114,16 +114,23 @@ export default function BoardView({
                 </span>
               </div>
 
-              {cards.map((card) => (
-                <BoardCard key={card.id} card={card} onOpen={onOpenCard} />
-              ))}
+              {/*
+                Only the cards scroll — the column header stays put. The
+                -mx-1/px-1 pair gives card borders and shadows room so the
+                scroll container does not clip them at the edges.
+              */}
+              <div className="-mx-1 flex min-h-0 flex-1 flex-col gap-2.5 px-1 lg:overflow-y-auto">
+                {cards.map((card) => (
+                  <BoardCard key={card.id} card={card} onOpen={onOpenCard} />
+                ))}
 
-              {cards.length === 0 && (
-                // Keeps the column a visible drop target once it empties out.
-                <p className="px-1 py-6 text-center text-[11px] text-slate-400">
-                  Déposez une candidature ici
-                </p>
-              )}
+                {cards.length === 0 && (
+                  // Keeps the column a visible drop target once it empties out.
+                  <p className="px-1 py-6 text-center text-[11px] text-slate-400">
+                    Déposez une candidature ici
+                  </p>
+                )}
+              </div>
             </KanbanColumn>
           )
         })}

@@ -16,9 +16,10 @@ import type { CandidatureStatus } from "@/types"
  * Two of these classes exist to disarm defaults the vendored column carries,
  * without editing it:
  *
- *   `border-transparent` — Dice UI ships a bare `border`, and in Tailwind v4
+ *   `border-<tone>-200` — Dice UI ships a bare `border`, and in Tailwind v4
  *   that is a width only: the colour falls through to `currentColor`, drawing
- *   a near-black outline around every column.
+ *   a near-black outline around every column. Each column therefore names its
+ *   own border colour, a soft shade of the tone of its dot and badge.
  *
  *   `dark:bg-kanban-*` — the same colour repeated under `dark:`, which looks
  *   redundant and is not. Dice UI ships `dark:bg-zinc-900`; declaring our own
@@ -42,7 +43,7 @@ export const BOARD_COLUMNS: BoardColumnConfig[] = [
   {
     status: "to_send",
     label: "À envoyer",
-    surface: "border-transparent bg-kanban-to-send dark:bg-kanban-to-send",
+    surface: "border-slate-200 bg-kanban-to-send dark:bg-kanban-to-send",
     dot: "bg-slate-500",
     text: "text-slate-700",
     badge: "bg-slate-200 text-slate-700",
@@ -50,7 +51,7 @@ export const BOARD_COLUMNS: BoardColumnConfig[] = [
   {
     status: "sent",
     label: "Envoyée",
-    surface: "border-transparent bg-kanban-sent dark:bg-kanban-sent",
+    surface: "border-blue-200 bg-kanban-sent dark:bg-kanban-sent",
     dot: "bg-blue-500",
     text: "text-blue-700",
     badge: "bg-blue-200 text-blue-800",
@@ -58,7 +59,7 @@ export const BOARD_COLUMNS: BoardColumnConfig[] = [
   {
     status: "interview",
     label: "Entretien",
-    surface: "border-transparent bg-kanban-interview dark:bg-kanban-interview",
+    surface: "border-violet-200 bg-kanban-interview dark:bg-kanban-interview",
     dot: "bg-violet-500",
     text: "text-violet-700",
     badge: "bg-violet-200 text-violet-800",
@@ -66,7 +67,7 @@ export const BOARD_COLUMNS: BoardColumnConfig[] = [
   {
     status: "rejected",
     label: "Refusée",
-    surface: "border-transparent bg-kanban-rejected dark:bg-kanban-rejected",
+    surface: "border-red-200 bg-kanban-rejected dark:bg-kanban-rejected",
     dot: "bg-red-500",
     text: "text-red-700",
     badge: "bg-red-200 text-red-800",
@@ -74,7 +75,7 @@ export const BOARD_COLUMNS: BoardColumnConfig[] = [
   {
     status: "accepted",
     label: "Acceptée",
-    surface: "border-transparent bg-kanban-accepted dark:bg-kanban-accepted",
+    surface: "border-emerald-200 bg-kanban-accepted dark:bg-kanban-accepted",
     dot: "bg-emerald-500",
     text: "text-emerald-700",
     badge: "bg-emerald-200 text-emerald-800",

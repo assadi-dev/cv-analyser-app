@@ -10,14 +10,14 @@ import { BOARD_COLUMNS } from "../../_lib/columns.config"
 export function BoardSkeleton() {
   return (
     <div
-      className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5"
+      className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:min-h-0 lg:flex-1 lg:grid-cols-5 lg:grid-rows-[minmax(0,1fr)]"
       aria-hidden="true"
     >
       {BOARD_COLUMNS.map((column) => (
         <div
           key={column.status}
           className={cn(
-            "flex min-h-[400px] flex-col gap-2.5 rounded-[12px] p-3",
+            "flex min-h-[400px] flex-col gap-2.5 rounded-[12px] p-3 lg:min-h-0 lg:overflow-hidden",
             column.surface
           )}
         >

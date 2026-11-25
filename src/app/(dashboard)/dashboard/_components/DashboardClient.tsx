@@ -33,10 +33,13 @@ export function DashboardClient() {
   }, [])
 
   return (
-    <div className="flex flex-col gap-6 p-4 sm:p-8">
+    // From `lg` the page is exactly one viewport tall (the layout's <main> has
+    // a fixed height): the board takes whatever the stats leave and scrolls
+    // inside its columns, so the page itself never grows past the screen.
+    <div className="flex flex-col gap-6 p-4 sm:p-8 lg:h-full">
       <StatsSection stats={stats} />
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 lg:min-h-[360px] lg:flex-1">
         <BoardHeader
           total={candidatures.length}
           onNewAnalysis={handleNewAnalysis}
