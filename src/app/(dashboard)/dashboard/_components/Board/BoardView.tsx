@@ -79,7 +79,8 @@ export default function BoardView({
   return (
     <Kanban
       value={board}
-      onValueChange={setBoard}
+      // Dice UI types the board by any identifier; ours is keyed by status.
+      onValueChange={(next) => setBoard(next as KanbanColumns)}
       getItemValue={(card) => card.id}
       onDragStart={handleDragStart}
       onDragEnd={(event) => setDroppedCardId(String(event.active.id))}

@@ -5,7 +5,7 @@ import type {
 } from "@/types"
 
 /** The board as the API delivers it: one entry per column, cards in order. */
-export type KanbanColumns = Record<string, CandidatureSummary[]>
+export type KanbanColumns = Record<CandidatureStatus, CandidatureSummary[]>
 
 /** Where a card currently sits on the board. */
 export interface CardLocation {
@@ -125,13 +125,11 @@ export function moveCard(
  * holds matches what the server is about to store.
  */
 export function syncCardStatuses(columns: KanbanColumns): KanbanColumns {
-  const synced: KanbanColumns = {}
+  const synced: KanbanColumns = { ...columns }
 
-  for (const [status, cards] of Object.entries(columns)) {
-    synced[status] = cards.map((card) =>
-      card.status === status
-        ? card
-        : { ...card, status: status as CandidatureStatus }
+  for (const status of Object.keys(columns) as CandidatureStatus[]) {
+    synced[status] = columns[status].map((card) =>
+      card.status === status ? card : { ...card, status }
     )
   }
 

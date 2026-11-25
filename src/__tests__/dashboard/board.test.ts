@@ -7,6 +7,7 @@ import {
   syncCardStatuses,
   type KanbanColumns,
 } from "@/app/(dashboard)/dashboard/_lib/board"
+import type { CandidatureStatus } from "@/types"
 import {
   MOCK_BOARD,
   EMPTY_BOARD,
@@ -21,8 +22,8 @@ const D = "22222222-2222-2222-2222-222222222201" // sent[0]    — Doctolib
 const E = "22222222-2222-2222-2222-222222222202" // sent[1]    — Alan
 const F = "33333333-3333-3333-3333-333333333301" // interview[0]
 
-const ids = (columns: KanbanColumns, status: string) =>
-  (columns[status] ?? []).map((c) => c.id)
+const ids = (columns: KanbanColumns, status: CandidatureStatus) =>
+  columns[status].map((c) => c.id)
 
 // ─── locateCard ──────────────────────────────────────────────────────────────
 
@@ -243,15 +244,15 @@ describe("syncCardStatuses", () => {
       ],
     }
     expect(locateCard(moved, A)).toEqual({ status: "interview", index: 1 })
-    expect(moved.interview[1].status).toBe("to_send")
+    expect(moved.interview[1]?.status).toBe("to_send")
 
     const synced = syncCardStatuses(moved)
-    expect(synced.interview[1].status).toBe("interview")
+    expect(synced.interview[1]?.status).toBe("interview")
   })
 
   it("leaves a board that already agrees with itself untouched", () => {
     const synced = syncCardStatuses(MOCK_BOARD)
-    for (const status of Object.keys(MOCK_BOARD)) {
+    for (const status of Object.keys(MOCK_BOARD) as CandidatureStatus[]) {
       expect(ids(synced, status)).toEqual(ids(MOCK_BOARD, status))
       synced[status].forEach((card, index) => {
         // Same object, not a copy: nothing to update means nothing to
@@ -264,10 +265,10 @@ describe("syncCardStatuses", () => {
   it("does not mutate the board it is given", () => {
     const moved = {
       ...EMPTY_BOARD,
-      accepted: [MOCK_BOARD.to_send[0]],
+      accepted: [MOCK_BOARD.to_send[0]!],
     }
     syncCardStatuses(moved)
-    expect(moved.accepted[0].status).toBe("to_send")
+    expect(moved.accepted[0]?.status).toBe("to_send")
   })
 
   it("keeps every column, including the empty ones", () => {

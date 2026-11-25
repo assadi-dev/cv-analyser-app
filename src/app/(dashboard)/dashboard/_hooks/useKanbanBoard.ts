@@ -17,9 +17,13 @@ import { syncCardStatuses, type KanbanColumns } from "../_lib/board"
  * A module constant, not an inline literal: a fresh object on every render
  * would break the memo below and re-run every consumer that depends on it.
  */
-const EMPTY_BOARD: KanbanColumns = Object.fromEntries(
-  BOARD_COLUMNS.map((column) => [column.status, []])
-)
+const EMPTY_BOARD: KanbanColumns = {
+  to_send: [],
+  sent: [],
+  interview: [],
+  rejected: [],
+  accepted: [],
+}
 
 export function useKanbanBoard() {
   const { data, isLoading, isError, refetch } = useQuery({

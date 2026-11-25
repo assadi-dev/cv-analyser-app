@@ -111,7 +111,7 @@ describe("useKanbanBoard", () => {
     })
 
     await waitFor(() => expect(result.current.candidatures).toHaveLength(6))
-    expect(result.current.candidatures[0].id).toBe(DATAMEID)
+    expect(result.current.candidatures[0]?.id).toBe(DATAMEID)
     expect(result.current.candidatures.at(-1)?.id).toBe(PAYFIT)
   })
 
