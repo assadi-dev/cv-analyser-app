@@ -29,13 +29,26 @@ if (!connectionString) {
 }
 
 /**
+ * TLS toward Postgres is the deployment's call, set with `?sslmode=` in
+ * DATABASE_URL (a managed database asks for `require`, a local one `disable`).
+ *
+ * Without it, TLS is negotiated: used when the server offers it, plain
+ * otherwise, like libpq and asyncpg (the API's driver). It was forced to
+ * `require` in production, and postgres-js answers a server that has no TLS by
+ * starting a handshake anyway: the server drops the connection and every query
+ * fails with ECONNRESET. The `ssl` option wins over the URL, so it is only
+ * passed when the URL says nothing.
+ */
+const hasSslMode = connectionString.includes("sslmode=")
+
+/**
  * postgres-js client.
  * `max: 1` for serverless/edge environments (Next.js API routes).
  * Increase for long-running server processes.
  */
 const client = postgres(connectionString, {
   max: 1,
-  ssl: process.env.NODE_ENV === "production" ? "require" : false,
+  ...(hasSslMode ? {} : { ssl: "prefer" as const }),
 })
 
 export const db = drizzle(client, { schema })
