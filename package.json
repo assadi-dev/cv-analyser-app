@@ -2,7 +2,7 @@
   "name": "cv-analyser-app",
   "version": "0.1.0",
   "private": true,
-  "engine": {
+  "engines": {
     "node": ">=24"
   },
   "scripts": {
