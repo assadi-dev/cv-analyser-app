@@ -90,6 +90,10 @@ export interface CandidatureSummary {
   contract_type: ContractType
   work_mode: WorkMode
   source_platform: string | null
+  // Returned by the API but not shown in the list: the edit form pre-fills from them.
+  source_url?: string | null
+  company_city?: string | null
+  notes?: string | null
   created_at: string
   updated_at: string
 }

@@ -2,27 +2,28 @@
 
 import type { ComponentType } from "react"
 import { Form } from "@/components/ui/form"
-import type { AddCandidatureWizard } from "../../../_hooks/useAddCandidatureWizard"
-import type { AddCandidatureStepId } from "../../../_lib/add-candidature-steps.config"
-import { AddCandidatureStepper } from "./AddCandidatureStepper"
+import type { CandidatureWizard } from "../../../_hooks/useCandidatureWizard"
+import type { CandidatureStepId } from "../../../_lib/candidature-steps.config"
+import type { CandidatureStepProps } from "./CandidatureStepProps"
+import { CandidatureStepper } from "./CandidatureStepper"
 import { StepTransition } from "./StepTransition"
 import { JobOfferStep } from "./JobOfferStep"
 import { CompanyStep } from "./CompanyStep"
 import { FollowUpStep } from "./FollowUpStep"
 
-const STEP_COMPONENTS: Record<AddCandidatureStepId, ComponentType> = {
+const STEP_COMPONENTS: Record<CandidatureStepId, ComponentType<CandidatureStepProps>> = {
   offer: JobOfferStep,
   company: CompanyStep,
   followup: FollowUpStep,
 }
 
-interface AddCandidatureFormProps {
+interface CandidatureFormProps {
   formId: string
-  wizard: AddCandidatureWizard
+  wizard: CandidatureWizard
 }
 
-export function AddCandidatureForm({ formId, wizard }: AddCandidatureFormProps) {
-  const { form, steps, stepIndex, direction, goTo, handleSubmit } = wizard
+export function CandidatureForm({ formId, wizard }: CandidatureFormProps) {
+  const { form, mode, steps, stepIndex, direction, goTo, handleSubmit } = wizard
   const step = steps[stepIndex]
   const CurrentStep = STEP_COMPONENTS[step.id]
 
@@ -33,14 +34,14 @@ export function AddCandidatureForm({ formId, wizard }: AddCandidatureFormProps) 
         onSubmit={handleSubmit}
         className="flex h-full min-h-0 flex-col"
       >
-        <AddCandidatureStepper
+        <CandidatureStepper
           steps={steps}
           currentIndex={stepIndex}
           onStepClick={goTo}
         />
 
         <StepTransition stepKey={step.id} direction={direction}>
-          <CurrentStep />
+          <CurrentStep mode={mode} />
         </StepTransition>
 
         {/*

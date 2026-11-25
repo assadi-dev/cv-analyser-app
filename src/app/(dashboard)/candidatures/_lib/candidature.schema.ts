@@ -6,7 +6,7 @@ export const contactSchema = z.object({
   value:        z.string().min(1, "Valeur requise"),
 })
 
-export const addCandidatureSchema = z.object({
+export const candidatureSchema = z.object({
   company_name:    z.string().min(1, "Nom de l'entreprise requis"),
   company_city:    z.string().optional().default(""),
   job_title:       z.string().min(1, "Intitulé du poste requis"),
@@ -28,9 +28,9 @@ export const addCandidatureSchema = z.object({
   notes:           z.string().optional().default(""),
 })
 
-export type AddCandidatureFormValues = z.infer<typeof addCandidatureSchema>
+export type CandidatureFormValues = z.infer<typeof candidatureSchema>
 
-export const ADD_CANDIDATURE_DEFAULTS: AddCandidatureFormValues = {
+export const CANDIDATURE_FORM_DEFAULTS: CandidatureFormValues = {
   company_name:    "",
   company_city:    "",
   job_title:       "",

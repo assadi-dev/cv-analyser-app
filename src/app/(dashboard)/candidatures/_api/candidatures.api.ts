@@ -23,6 +23,22 @@ export interface CreateCandidaturePayload {
   contacts?: { name: string; contact_type: ContactType; value: string }[]
 }
 
+/**
+ * Partial update: a field that is absent is left as it is, and `null` clears
+ * an optional one. Mirrors the API's `CandidatureUpdate`.
+ */
+export interface UpdateCandidaturePayload {
+  company_name?: string
+  company_city?: string | null
+  job_title?: string
+  contract_type?: ContractType
+  work_mode?: WorkMode
+  source_platform?: string | null
+  source_url?: string | null
+  status?: CandidatureStatus
+  notes?: string | null
+}
+
 export const CANDIDATURES_QUERY_KEY = "candidatures"
 export const PAGE_SIZE = 10
 
@@ -50,3 +66,12 @@ export const createCandidature = (
   payload: CreateCandidaturePayload
 ): Promise<CandidatureSummary> =>
   api.post<CandidatureSummary>("/api/candidature", payload)
+
+export const updateCandidature = (
+  id: string,
+  payload: UpdateCandidaturePayload
+): Promise<CandidatureSummary> =>
+  api.patch<CandidatureSummary>(`/api/candidature/${id}`, payload)
+
+export const fetchCandidature = (id: string): Promise<CandidatureSummary> =>
+  api.get<CandidatureSummary>(`/api/candidature/${id}`)

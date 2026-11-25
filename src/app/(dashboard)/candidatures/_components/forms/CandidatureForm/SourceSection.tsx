@@ -15,7 +15,7 @@ import {
   FormItem,
   FormControl,
 } from "@/components/ui/form"
-import type { AddCandidatureFormValues } from "../../../_lib/add-candidature.schema"
+import type { CandidatureFormValues } from "../../../_lib/candidature.schema"
 
 const SOURCE_PLATFORMS = [
   "LinkedIn",
@@ -31,8 +31,13 @@ const SELECT_CONTENT_CLS = "bg-white border-[#E2E8F0] rounded-[8px] shadow-[var(
 const SELECT_ITEM_CLS = "text-[12px] text-[#374151] focus:bg-[#EDE9FE] focus:text-[#7C3AED] cursor-pointer"
 const FIELD_CLS = "h-[38px] rounded-[8px] bg-[#F8FAFC] border-[#E2E8F0] text-[12px] text-[#374151] placeholder:text-[#94A3B8] focus-visible:ring-1 focus-visible:ring-[#7C3AED]/30 focus-visible:ring-offset-0"
 
-export function SourceSection() {
-  const form = useFormContext<AddCandidatureFormValues>()
+interface SourceSectionProps {
+  /** Hide the "Nom de l'offre" input. Shown by default. */
+  showOfferName?: boolean
+}
+
+export function SourceSection({ showOfferName = true }: SourceSectionProps) {
+  const form = useFormContext<CandidatureFormValues>()
 
   return (
     <div className="flex flex-col gap-3">
@@ -63,21 +68,23 @@ export function SourceSection() {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="source_name"
-          render={({ field }) => (
-            <FormItem className="flex-1 space-y-0">
-              <FormControl>
-                <Input
-                  placeholder="Nom de l'offre (optionnel)"
-                  className={FIELD_CLS}
-                  {...field}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
+        {showOfferName && (
+          <FormField
+            control={form.control}
+            name="source_name"
+            render={({ field }) => (
+              <FormItem className="flex-1 space-y-0">
+                <FormControl>
+                  <Input
+                    placeholder="Nom de l'offre (optionnel)"
+                    className={FIELD_CLS}
+                    {...field}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        )}
       </div>
 
       <FormField

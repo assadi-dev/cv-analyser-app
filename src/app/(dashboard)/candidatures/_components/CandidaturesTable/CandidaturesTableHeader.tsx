@@ -1,7 +1,8 @@
 import { flexRender, type HeaderGroup } from "@tanstack/react-table"
 import type { CandidatureSummary } from "@/types"
 
-export const TABLE_GRID = "220px 1fr 110px 110px 120px 140px 80px"
+// The last column holds five 28px actions with their gaps (~176px).
+export const TABLE_GRID = "220px 1fr 110px 110px 120px 140px 190px"
 
 interface CandidaturesTableHeaderProps {
   headerGroups: HeaderGroup<CandidatureSummary>[]

@@ -1,17 +1,21 @@
 import { type ColumnDef } from "@tanstack/react-table"
-import { Eye, Trash2 } from "lucide-react"
 import { StatusBadge } from "@/components/ui/Badge"
 import { formatDate } from "@/lib/utils"
 import type { CandidatureSummary } from "@/types"
+import { CandidatureRowActions } from "../_components/CandidaturesTable/CandidatureRowActions"
 
 interface ColumnCallbacks {
   onDelete: (id: string) => void
   onView: (id: string) => void
+  onEdit: (id: string) => void
+  onAnalyse: (id: string) => void
 }
 
 export function createColumns({
   onDelete,
   onView,
+  onEdit,
+  onAnalyse,
 }: ColumnCallbacks): ColumnDef<CandidatureSummary>[] {
   return [
     {
@@ -88,24 +92,13 @@ export function createColumns({
       id: "actions",
       header: () => <span className="block text-center">Actions</span>,
       cell: ({ row }) => (
-        <div className="flex items-center gap-2 justify-center">
-          <button
-            className="w-7 h-7 rounded-[6px] flex items-center justify-center hover:opacity-80 transition-opacity"
-            style={{ background: "var(--color-primary-light)" }}
-            onClick={() => onView(row.original.id)}
-            aria-label="Voir"
-          >
-            <Eye size={13} style={{ color: "var(--color-primary)" }} />
-          </button>
-          <button
-            className="w-7 h-7 rounded-[6px] flex items-center justify-center hover:opacity-80 transition-opacity"
-            style={{ background: "var(--color-surface-muted)" }}
-            onClick={() => onDelete(row.original.id)}
-            aria-label="Supprimer"
-          >
-            <Trash2 size={13} style={{ color: "var(--color-text-subtle)" }} />
-          </button>
-        </div>
+        <CandidatureRowActions
+          id={row.original.id}
+          onView={onView}
+          onEdit={onEdit}
+          onAnalyse={onAnalyse}
+          onDelete={onDelete}
+        />
       ),
     },
   ]

@@ -9,12 +9,12 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form"
-import type { AddCandidatureFormValues } from "../../../_lib/add-candidature.schema"
+import type { CandidatureFormValues } from "../../../_lib/candidature.schema"
 
 const FIELD_CLS = "h-[38px] rounded-[8px] bg-[#F8FAFC] border-[#E2E8F0] text-[12px] text-[#374151] placeholder:text-[#94A3B8] focus-visible:ring-1 focus-visible:ring-[#7C3AED]/30 focus-visible:ring-offset-0"
 
 export function CompanySection() {
-  const form = useFormContext<AddCandidatureFormValues>()
+  const form = useFormContext<CandidatureFormValues>()
 
   return (
     <div className="flex flex-col gap-3">

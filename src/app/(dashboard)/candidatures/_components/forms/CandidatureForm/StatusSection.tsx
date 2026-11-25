@@ -13,7 +13,7 @@ import {
   FormItem,
   FormControl,
 } from "@/components/ui/form"
-import type { AddCandidatureFormValues } from "../../../_lib/add-candidature.schema"
+import type { CandidatureFormValues } from "../../../_lib/candidature.schema"
 
 const STATUS_OPTIONS = [
   { value: "to_send",   label: "À envoyer",  dot: "#64748B" },
@@ -27,12 +27,17 @@ const SELECT_TRIGGER_CLS = "h-[38px] rounded-[8px] bg-[#F8FAFC] border-[#E2E8F0]
 const SELECT_CONTENT_CLS = "bg-white border-[#E2E8F0] rounded-[8px] shadow-[var(--shadow-md)]"
 const SELECT_ITEM_CLS = "text-[12px] text-[#374151] focus:bg-[#EDE9FE] focus:text-[#7C3AED] cursor-pointer"
 
-export function StatusSection() {
-  const form = useFormContext<AddCandidatureFormValues>()
+interface StatusSectionProps {
+  /** Section title — "initial" only makes sense while creating. */
+  label?: string
+}
+
+export function StatusSection({ label = "Statut initial" }: StatusSectionProps) {
+  const form = useFormContext<CandidatureFormValues>()
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[12px] font-bold text-[#374151] tracking-[0.3px]">Statut initial</p>
+      <p className="text-[12px] font-bold text-[#374151] tracking-[0.3px]">{label}</p>
 
       <FormField
         control={form.control}

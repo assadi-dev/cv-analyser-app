@@ -17,6 +17,8 @@ interface UseCandidaturesTableOptions {
   onPageChange: (page: number) => void
   onDelete: (id: string) => void
   onView: (id: string) => void
+  onEdit: (id: string) => void
+  onAnalyse: (id: string) => void
 }
 
 export function useCandidaturesTable({
@@ -26,10 +28,12 @@ export function useCandidaturesTable({
   onPageChange,
   onDelete,
   onView,
+  onEdit,
+  onAnalyse,
 }: UseCandidaturesTableOptions) {
   const columns = useMemo(
-    () => createColumns({ onDelete, onView }),
-    [onDelete, onView]
+    () => createColumns({ onDelete, onView, onEdit, onAnalyse }),
+    [onDelete, onView, onEdit, onAnalyse]
   )
 
   const pagination: PaginationState = {

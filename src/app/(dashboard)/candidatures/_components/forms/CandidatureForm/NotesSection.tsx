@@ -3,10 +3,10 @@
 import { useFormContext } from "react-hook-form"
 import { Textarea } from "@/components/ui/textarea"
 import { FormField, FormItem, FormControl } from "@/components/ui/form"
-import type { AddCandidatureFormValues } from "../../../_lib/add-candidature.schema"
+import type { CandidatureFormValues } from "../../../_lib/candidature.schema"
 
 export function NotesSection() {
-  const form = useFormContext<AddCandidatureFormValues>()
+  const form = useFormContext<CandidatureFormValues>()
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">

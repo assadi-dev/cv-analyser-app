@@ -1,17 +1,19 @@
-import { Eye, Trash2 } from "lucide-react"
 import { StatusBadge } from "@/components/ui/Badge"
 import { formatDate } from "@/lib/utils"
 import type { CandidatureSummary } from "@/types"
 import { TABLE_GRID } from "./CandidaturesTableHeader"
+import { CandidatureRowActions } from "./CandidatureRowActions"
 
 interface CandidaturesTableRowProps {
   item: CandidatureSummary
   index: number
   onDelete: (id: string) => void
   onView: (id: string) => void
+  onEdit: (id: string) => void
+  onAnalyse: (id: string) => void
 }
 
-export function CandidaturesTableRow({ item, index, onDelete, onView }: CandidaturesTableRowProps) {
+export function CandidaturesTableRow({ item, index, onDelete, onView, onEdit, onAnalyse }: CandidaturesTableRowProps) {
   return (
     <div
       className="grid h-16 px-5 items-center border-b hover:bg-[var(--color-surface-muted)] transition-colors"
@@ -57,24 +59,13 @@ export function CandidaturesTableRow({ item, index, onDelete, onView }: Candidat
 
       <StatusBadge status={item.status} />
 
-      <div className="flex items-center gap-2 justify-center">
-        <button
-          className="w-7 h-7 rounded-[6px] flex items-center justify-center hover:opacity-80 transition-opacity"
-          style={{ background: "var(--color-primary-light)" }}
-          onClick={() => onView(item.id)}
-          aria-label="Voir"
-        >
-          <Eye size={13} style={{ color: "var(--color-primary)" }} />
-        </button>
-        <button
-          className="w-7 h-7 rounded-[6px] flex items-center justify-center hover:opacity-80 transition-opacity"
-          style={{ background: "var(--color-surface-muted)" }}
-          onClick={() => onDelete(item.id)}
-          aria-label="Supprimer"
-        >
-          <Trash2 size={13} style={{ color: "var(--color-text-subtle)" }} />
-        </button>
-      </div>
+      <CandidatureRowActions
+        id={item.id}
+        onView={onView}
+        onEdit={onEdit}
+        onAnalyse={onAnalyse}
+        onDelete={onDelete}
+      />
     </div>
   )
 }

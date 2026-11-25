@@ -16,6 +16,8 @@ interface CandidaturesTableProps {
   onPageChange: (page: number) => void
   onDelete: (id: string) => void
   onView: (id: string) => void
+  onEdit: (id: string) => void
+  onAnalyse: (id: string) => void
 }
 
 export function CandidaturesTable({
@@ -26,8 +28,19 @@ export function CandidaturesTable({
   onPageChange,
   onDelete,
   onView,
+  onEdit,
+  onAnalyse,
 }: CandidaturesTableProps) {
-  const table = useCandidaturesTable({ data: items, total, page, onPageChange, onDelete, onView })
+  const table = useCandidaturesTable({
+    data: items,
+    total,
+    page,
+    onPageChange,
+    onDelete,
+    onView,
+    onEdit,
+    onAnalyse,
+  })
 
   return (
     <div
@@ -48,6 +61,8 @@ export function CandidaturesTable({
             index={i}
             onDelete={onDelete}
             onView={onView}
+            onEdit={onEdit}
+            onAnalyse={onAnalyse}
           />
         ))
       )}

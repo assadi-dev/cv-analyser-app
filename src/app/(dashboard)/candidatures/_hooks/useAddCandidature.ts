@@ -8,10 +8,10 @@ import {
   createCandidature,
   type CreateCandidaturePayload,
 } from "../_api/candidatures.api"
-import type { AddCandidatureFormValues } from "../_lib/add-candidature.schema"
+import type { CandidatureFormValues } from "../_lib/candidature.schema"
 import type { PaginatedResponse, CandidatureSummary } from "@/types"
 
-function toPayload(values: AddCandidatureFormValues): CreateCandidaturePayload {
+function toPayload(values: CandidatureFormValues): CreateCandidaturePayload {
   return {
     company_name:    values.company_name,
     company_city:    values.company_city || null,
@@ -33,7 +33,7 @@ export function useAddCandidature() {
   const toast = useToast()
 
   return useMutation({
-    mutationFn: (values: AddCandidatureFormValues) =>
+    mutationFn: (values: CandidatureFormValues) =>
       createCandidature(toPayload(values)),
     onSuccess: (newItem) => {
       queryClient.setQueriesData<PaginatedResponse<CandidatureSummary>>(

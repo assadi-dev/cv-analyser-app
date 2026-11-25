@@ -4,10 +4,10 @@ import { Fragment } from "react"
 import { Check } from "lucide-react"
 import { motion } from "motion/react"
 import { cn } from "@/lib/utils"
-import type { AddCandidatureStepConfig } from "../../../_lib/add-candidature-steps.config"
+import type { CandidatureStepConfig } from "../../../_lib/candidature-steps.config"
 
-interface AddCandidatureStepperProps {
-  steps: AddCandidatureStepConfig[]
+interface CandidatureStepperProps {
+  steps: CandidatureStepConfig[]
   currentIndex: number
   onStepClick: (index: number) => void
 }
@@ -18,11 +18,11 @@ interface AddCandidatureStepperProps {
  * Only steps already reached are clickable: going back is free, going forward
  * goes through "Suivant" so each step is validated on the way.
  */
-export function AddCandidatureStepper({
+export function CandidatureStepper({
   steps,
   currentIndex,
   onStepClick,
-}: AddCandidatureStepperProps) {
+}: CandidatureStepperProps) {
   return (
     <nav
       aria-label="Progression"

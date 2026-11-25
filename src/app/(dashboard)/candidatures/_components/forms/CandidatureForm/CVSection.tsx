@@ -14,7 +14,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { FormField, FormItem, FormControl } from "@/components/ui/form"
 import { cn } from "@/lib/utils"
-import type { AddCandidatureFormValues } from "../../../_lib/add-candidature.schema"
+import type { CandidatureFormValues } from "../../../_lib/candidature.schema"
 
 const MAX_MB = 2
 const MAX_BYTES = MAX_MB * 1024 * 1024
@@ -34,7 +34,7 @@ function validatePDF(f: File): boolean {
 }
 
 export function CVSection() {
-  const form = useFormContext<AddCandidatureFormValues>()
+  const form = useFormContext<CandidatureFormValues>()
   // Held by the form, not by local state: this step unmounts when the user
   // moves on, and the file must still be there when they come back.
   const file = useWatch({ control: form.control, name: "cv_file" })

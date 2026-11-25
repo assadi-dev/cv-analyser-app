@@ -16,7 +16,7 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form"
-import type { AddCandidatureFormValues } from "../../../_lib/add-candidature.schema"
+import type { CandidatureFormValues } from "../../../_lib/candidature.schema"
 
 const INPUT_CLS = "h-[36px] rounded-[8px] bg-white border-[#E2E8F0] text-[12px] text-[#374151] placeholder:text-[#94A3B8] focus-visible:ring-1 focus-visible:ring-[#7C3AED]/30 focus-visible:ring-offset-0"
 const SELECT_TRIGGER_CLS = "h-[36px] rounded-[8px] bg-white border-[#E2E8F0] text-[12px] text-[#374151] focus:ring-1 focus:ring-[#7C3AED]/30 focus:ring-offset-0"
@@ -24,7 +24,7 @@ const SELECT_CONTENT_CLS = "bg-white border-[#E2E8F0] rounded-[8px] shadow-[var(
 const SELECT_ITEM_CLS = "text-[12px] text-[#374151] focus:bg-[#EDE9FE] focus:text-[#7C3AED] cursor-pointer"
 
 function ContactTypeIcon({ index }: { index: number }) {
-  const { watch } = useFormContext<AddCandidatureFormValues>()
+  const { watch } = useFormContext<CandidatureFormValues>()
   const type = watch(`contacts.${index}.contact_type`)
   return type === "email"
     ? <Mail size={13} className="text-[#7C3AED]" />
@@ -32,7 +32,7 @@ function ContactTypeIcon({ index }: { index: number }) {
 }
 
 export function ContactsSection() {
-  const form = useFormContext<AddCandidatureFormValues>()
+  const form = useFormContext<CandidatureFormValues>()
   const { fields, append, remove } = useFieldArray({ control: form.control, name: "contacts" })
 
   return (
