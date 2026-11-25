@@ -59,12 +59,15 @@ type FormContact = CandidatureFormValues["contacts"][number]
 
 const sameContacts = (a: FormContact[], b: FormContact[]) =>
   a.length === b.length &&
-  a.every(
-    (contact, i) =>
-      contact.name === b[i].name &&
-      contact.contact_type === b[i].contact_type &&
-      contact.value === b[i].value
-  )
+  a.every((contact, i) => {
+    const other = b[i]
+    return (
+      other !== undefined &&
+      contact.name === other.name &&
+      contact.contact_type === other.contact_type &&
+      contact.value === other.value
+    )
+  })
 
 /**
  * What the user actually changed, ready for a PATCH.

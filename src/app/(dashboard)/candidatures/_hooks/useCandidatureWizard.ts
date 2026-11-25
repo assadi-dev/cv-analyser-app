@@ -65,7 +65,7 @@ export function useCandidatureWizard(
   const goNext = useCallback(async () => {
     if (isLast) return
     try {
-      const { fields } = steps[step.index]
+      const fields = steps[step.index]?.fields ?? []
       // An empty list would make `trigger` validate the whole form.
       if (fields.length > 0) {
         const isValid = await form.trigger(fields, { shouldFocus: true })

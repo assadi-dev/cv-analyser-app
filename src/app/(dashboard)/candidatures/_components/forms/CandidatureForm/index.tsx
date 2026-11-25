@@ -25,6 +25,8 @@ interface CandidatureFormProps {
 export function CandidatureForm({ formId, wizard }: CandidatureFormProps) {
   const { form, mode, steps, stepIndex, direction, goTo, handleSubmit } = wizard
   const step = steps[stepIndex]
+  // The wizard keeps the index inside the steps: this only narrows the type.
+  if (!step) return null
   const CurrentStep = STEP_COMPONENTS[step.id]
 
   return (
